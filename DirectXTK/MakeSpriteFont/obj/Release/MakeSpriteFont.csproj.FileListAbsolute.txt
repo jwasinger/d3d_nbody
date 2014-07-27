@@ -1,0 +1,5 @@
+C:\Users\Jared\Documents\Visual Studio 2012\Projects\DirectXTK\MakeSpriteFont\bin\Release\MakeSpriteFont.exe
+C:\Users\Jared\Documents\Visual Studio 2012\Projects\DirectXTK\MakeSpriteFont\bin\Release\MakeSpriteFont.pdb
+C:\Users\Jared\Documents\Visual Studio 2012\Projects\DirectXTK\MakeSpriteFont\obj\Release\MakeSpriteFont.csprojResolveAssemblyReference.cache
+C:\Users\Jared\Documents\Visual Studio 2012\Projects\DirectXTK\MakeSpriteFont\obj\Release\MakeSpriteFont.exe
+C:\Users\Jared\Documents\Visual Studio 2012\Projects\DirectXTK\MakeSpriteFont\obj\Release\MakeSpriteFont.pdb
