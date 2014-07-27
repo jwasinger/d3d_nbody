@@ -1,6 +1,0 @@
-->declare global arrays of particle positions: gposx, gposy, gposz
-
-Kernel Bounding Box:
-	
-	-> declare floating point variables for min/max x,y,z values: minx, maxx, miny, maxy, minz,maxz, 
-	-> declare shared arrays to hold thread computation values for min/max x,y,z values: sminx, smaxx, sminy, smaxy, sminz, smaxz
