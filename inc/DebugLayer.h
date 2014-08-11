@@ -41,7 +41,8 @@ namespace NBody
 		Renderer* renderer;
 		const Timer* timer;
 		const InputController *inputController;
-
+		
+		RECT windowRect;
 		DebugOptions debugOptions;
 
 		ID3D11Buffer *axesVBuffer;

@@ -29,6 +29,7 @@ namespace NBody
 			return false;
 		}
 
+		this->windowRect = windowRect;
 		this->debugOptions = options;
 		this->renderer = renderer;
 		this->inputController = inputController;
@@ -62,7 +63,7 @@ namespace NBody
 			return false;
 		}
 
-		this->console = new Console();
+		/*this->console = new Console();
 		if(!this->console->Init(this->renderer, 
 								Vector2(0.0f,0.0f), 
 								Vector2(0.0f, 0.0f), 
@@ -70,7 +71,7 @@ namespace NBody
 								windowRect.bottom - windowRect.top))
 		{
 			return false;
-		}
+		}*/
 
 		return true;
 	}
@@ -79,10 +80,10 @@ namespace NBody
 
 	bool testFileMap(void)
 	{	
-		
+		return false;
 	}
 
-	void updatePipe(void)
+	/*void updatePipe(void)
 	{
 		if(!clientConnected)
 			return;
@@ -100,7 +101,7 @@ namespace NBody
 				return;
 			}
 		}
-	}
+	}*/
 
 	void DebugLayer::Render(void)
 	{
@@ -146,14 +147,29 @@ namespace NBody
 			viewScreenRect.bottom = 
 			this->debug_drawMatrix(this->Camera.GetView(), )*/
 		}
+		
 
 		this->renderer->EndText();
 
 		/*this->projMat = tmp;
 		this->SetTransform(TRANSFORM_PROJECTION, this->projMat);*/
 
-		this->console->Render();
+		//this->console->Render();
 
 		this->renderer->PopMatrix(TRANSFORM_PROJECTION);
+
+		if(this->debugOptions.RenderAxes)
+		{
+			//axes should be transformed so that they appear in the upper lefthand corner of the screen
+			//axes should take up one quarter of the screen when the orientation of the view is such that it is aligned
+			//with the world x,y,z axes
+
+			Matrix proj = Matrix::CreateOrthographic(this->windowRect.right - this->windowRect.left,
+													 this->windowRect.bottom - this->windowRect.top,
+													 1.0f,
+													 20.0f);
+			
+			Matrix world = Matrix::CreateScale(0.25f, 0.25f, 1.0f);
+		}
 	}
 }

@@ -121,13 +121,13 @@ namespace NBody
 	
 		swapChainDescription.BufferCount = 1;
 		swapChainDescription.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDescription.Flags = 0;
+		//swapChainDescription.Flags = 0;
 
 		swapChainDescription.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		swapChainDescription.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChainDescription.BufferDesc.Width = this->bbWidth;
 		swapChainDescription.BufferDesc.Height = this->bbHeight;
-		swapChainDescription.BufferDesc.RefreshRate.Numerator = 0;
+		swapChainDescription.BufferDesc.RefreshRate.Numerator = 60;
 		swapChainDescription.BufferDesc.RefreshRate.Denominator = 1;
 		swapChainDescription.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	
