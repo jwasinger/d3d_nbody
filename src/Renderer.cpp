@@ -757,6 +757,10 @@ namespace NBody
 		return val;
 	}
 
+	/*
+	 * Adds a matrix to the top of the matrix stack and binds the current value of the matrices on the stack multiplied
+	 * together to the pipeline
+	 */
 	void Renderer::PushMatrix(TRANSFORM_TYPE type, const Matrix &val)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
@@ -826,13 +830,23 @@ namespace NBody
 		}
 	}
 	
+	/*
+	 * Removes the top matrix of of the matrix stack and binds the current value of the matrices on the stack multiplied
+	 * together to the pipeline
+	 */
 	void Renderer::PopMatrix(TRANSFORM_TYPE type)
 	{
+		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
+		ZeroMemory(&mappedSubresource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+		ID3D11Buffer *cBuffer[1];
+
 		switch(type)
 		{
 		case TRANSFORM_PROJECTION:
 			this->projStack.pop_back();
 			this->projMat = calcStackVal(this->projStack);
+
+
 			break;
 		case TRANSFORM_VIEW:
 			this->viewStack.pop_back();
@@ -843,6 +857,34 @@ namespace NBody
 			this->worldStack.pop_back();
 			this->worldMat = calcStackVal(this->worldStack);
 			break;
+		}
+	}
+
+	bool Renderer::StackHasMatrix(TRANSFORM_TYPE type)
+	{
+		switch(type)
+		{
+		case TRANSFORM_PROJECTION:
+			if(this->projStack.size() == 0)
+			{
+				return false;
+			}
+
+			return true;
+		case TRANSFORM_VIEW:
+			if(this->viewStack.size() == 0)
+			{
+				return false;
+			}
+
+			return true;
+		case TRANSFORM_WORLD:
+			if(this->worldStack.size() == 0)
+			{
+				return false;
+			}
+
+			return true;
 		}
 	}
 

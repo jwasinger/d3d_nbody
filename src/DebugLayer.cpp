@@ -163,13 +163,11 @@ namespace NBody
 			//axes should be transformed so that they appear in the upper lefthand corner of the screen
 			//axes should take up one quarter of the screen when the orientation of the view is such that it is aligned
 			//with the world x,y,z axes
-
-			Matrix proj = Matrix::CreateOrthographic(this->windowRect.right - this->windowRect.left,
-													 this->windowRect.bottom - this->windowRect.top,
-													 1.0f,
-													 20.0f);
 			
-			Matrix world = Matrix::CreateScale(0.25f, 0.25f, 1.0f);
+			Matrix transform = Matrix::CreateScale(0.25f, 0.25f, 1.0f) * this->renderer->GetInvTransform(TRANSFORM_TYPE::TRANSFORM_VIEW);
+			this->renderer->PushMatrix(TRANSFORM_TYPE::TRANSFORM_WORLD, transform);
+
+			this->renderer
 		}
 	}
 }

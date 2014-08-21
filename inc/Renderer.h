@@ -137,6 +137,9 @@ namespace NBody
 		void SetColor(const Vector4 &color);
 		void PushMatrix(TRANSFORM_TYPE type, const Matrix &value);
 		void PopMatrix(TRANSFORM_TYPE type);
+		bool StackHasMatrix(TRANSFORM_TYPE type);
+		void SetStack(bool enable);
+
 		void SetCullMode(D3D11_CULL_MODE mode);
 
 		void BeginText(void);
