@@ -90,9 +90,6 @@ namespace NBody
 		ID3D11InputLayout *colorInputLayout;
 		ID3D11Buffer *colorCBuffer;
 
-		std::vector<Matrix> worldStack;
-		std::vector<Matrix> projStack;
-		std::vector<Matrix> viewStack;
 		Matrix worldMat;
 		Matrix projMat;
 		Matrix viewMat;
@@ -132,15 +129,13 @@ namespace NBody
 		void UnbindShader(void);
 
 		SHADER_TYPE GetBoundShader(void) const { return this->boundShader; }
+		
+		void SetColor(const Vector4 &color);
+
+		void SetTransform(TRANSFORM_TYPE type, const Matrix &val);
 		Matrix GetTransform(TRANSFORM_TYPE type) const;
 		Matrix GetInvTransform(TRANSFORM_TYPE type) const; //invert the result of multiplying all matrices on the matrix stack
-
-		void SetColor(const Vector4 &color);
-		void PushMatrix(TRANSFORM_TYPE type, const Matrix &value);
-		void PopMatrix(TRANSFORM_TYPE type);
-		//bool StackHasMatrix(TRANSFORM_TYPE type);
-		void SetStack(bool enable);
-
+		
 		void SetCullMode(D3D11_CULL_MODE mode);
 
 		void BeginText(void);

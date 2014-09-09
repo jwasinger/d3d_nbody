@@ -416,98 +416,6 @@ namespace NBody
 		return true;
 	}
 
-	Matrix Renderer::GetTransform(TRANSFORM_TYPE type) const
-	{
-		switch(type)
-		{
-		case TRANSFORM_WORLD:
-			return this->worldMat;
-			break;
-		case TRANSFORM_PROJECTION:
-			return this->projMat;
-			break;
-		case TRANSFORM_VIEW:
-			return this->viewMat;
-			break;
-		}
-		
-		OutputDebugString("\nInvalid parameters to Renderer::GetTransform()\n");
-	}
-		
-	/*bool Renderer::createShadersAndInputLayout(void)
-	{
-		UINT flags1 = 0;
-
-#if _DEBUG
-		
-		flags1 |= D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG; 
-
-#endif
-		ID3DBlob *vShaderCode = nullptr;
-		ID3DBlob *pShaderCode = nullptr;
-		ID3DBlob *errorCode = nullptr;
-
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"VSPointSprite.hlsl").data(), nullptr, nullptr, "VShader", "vs_5_0", flags1, 0, &vShaderCode, &errorCode)))
-		{
-			SafeRelease<ID3DBlob>(&vShaderCode);	
-			if(errorCode)
-			{
-				OutputDebugStringA((LPCSTR)errorCode->GetBufferPointer());
-				SafeRelease<ID3DBlob>(&errorCode);
-			}
-
-			return false;
-		}
-		
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"PSPointSprite.hlsl").data(), nullptr, nullptr, "PShader", "ps_5_0", flags1, 0, &pShaderCode, &errorCode)))
-		{
-			SafeRelease<ID3DBlob>(&pShaderCode);	
-			if(errorCode)
-			{
-				OutputDebugStringA((LPCSTR)errorCode->GetBufferPointer());
-				SafeRelease<ID3DBlob>(&errorCode);
-			}
-
-			return false;
-		}
-
-		if(FAILED(this->Device->CreatePixelShader(pShaderCode->GetBufferPointer(), pShaderCode->GetBufferSize(), nullptr, &this->pShader)))
-		{
-			return false;
-		}
-
-		if(FAILED(this->Device->CreateVertexShader(vShaderCode->GetBufferPointer(), vShaderCode->GetBufferSize(), nullptr, &this->vShader)))
-		{
-			return false;
-		}
-
-		D3D11_INPUT_ELEMENT_DESC positionInputElement;
-		positionInputElement.AlignedByteOffset = 0;
-		positionInputElement.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		positionInputElement.InputSlot = 0;
-		positionInputElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		positionInputElement.InstanceDataStepRate = 0;
-		positionInputElement.SemanticName = "POSITION";
-		positionInputElement.SemanticIndex = 0;
-
-		if(FAILED(this->Device->CreateInputLayout(&positionInputElement, 1, vShaderCode->GetBufferPointer(), vShaderCode->GetBufferSize(), &this->PSInputLayout)))
-			return false;
-
-		D3D11_INPUT_ELEMENT_DESC textureCoordElementDesc;
-		textureCoordElementDesc.AlignedByteOffset = 16;
-		textureCoordElementDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
-		textureCoordElementDesc.InputSlot = 1;
-		textureCoordElementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		textureCoordElementDesc.InstanceDataStepRate = 0;
-		textureCoordElementDesc.SemanticIndex = 0;
-		textureCoordElementDesc.SemanticName = ""
-		SafeRelease<ID3DBlob>(&vShaderCode);
-		SafeRelease<ID3DBlob>(&pShaderCode);
-
-		return true;
-	}
-*/
-
 	Matrix Renderer::GetInvTransform(TRANSFORM_TYPE type) const
 	{
 		switch(type)
@@ -743,25 +651,7 @@ namespace NBody
 		return true;
 	}
 
-	Matrix calcStackVal(std::vector<Matrix> &stack)
-	{
-		if(stack.size() == 0)
-			return Matrix();
-
-		Matrix val = stack[0];
-		for(int i = 1; i < stack.size(); i++)
-		{
-			val *= stack[i];
-		}
-		
-		return val;
-	}
-
-	/*
-	 * Adds a matrix to the top of the matrix stack and binds the current value of the matrices on the stack multiplied
-	 * together to the pipeline
-	 */
-	void Renderer::PushMatrix(TRANSFORM_TYPE type, const Matrix &val)
+	void Renderer::SetTransform(TRANSFORM_TYPE type, const Matrix &val)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
 		ZeroMemory(&mappedSubresource, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -772,9 +662,7 @@ namespace NBody
 		{
 		case TRANSFORM_WORLD:
 
-			//this->worldMat = val;
-			this->worldStack.push_back(val);
-			this->worldMat = calcStackVal(this->worldStack);
+			this->worldMat = val;
 			this->invWorldMat = this->worldMat.Invert();
 
 			this->context->Map(this->worldCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
@@ -790,9 +678,7 @@ namespace NBody
 			break;
 		case TRANSFORM_VIEW:
 			
-			//this->Camera.SetView(val);
-			this->viewStack.push_back(val);
-			this->viewMat = calcStackVal(this->viewStack);
+			this->viewMat = val;
 			this->invViewMat = this->viewMat.Invert();
 
 			this->context->Map(this->viewCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
@@ -807,10 +693,7 @@ namespace NBody
 
 			break;
 		case TRANSFORM_PROJECTION:
-
-			//this->projMat = val;
-			this->projStack.push_back(val);
-			this->projMat = calcStackVal(this->projStack);
+			this->projMat = val;
 			this->invProjMat = this->projMat.Invert();
 
 			this->context->Map(this->projectionCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
@@ -823,81 +706,27 @@ namespace NBody
 			this->context->PSSetConstantBuffers(2, 1, cBuffer);
 			this->context->GSSetConstantBuffers(2, 1, cBuffer);
 
-			break;
-		default:
-			return;
 			break;
 		}
 	}
 	
-	/*
-	 * Removes the top matrix of of the matrix stack and binds the current value of the matrices on the stack multiplied
-	 * together to the pipeline
-	 */
-	void Renderer::PopMatrix(TRANSFORM_TYPE type)
+	Matrix Renderer::GetTransform(TRANSFORM_TYPE type) const
 	{
-		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-		ZeroMemory(&mappedSubresource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-		ID3D11Buffer *cBuffer[1];
-
 		switch(type)
 		{
+		case TRANSFORM_WORLD:
+			return this->worldMat;
+			break;
 		case TRANSFORM_PROJECTION:
-			this->projStack.pop_back();
-			this->projMat = calcStackVal(this->projStack);
-
-			this->invProjMat = this->projMat.Invert();
-
-			this->context->Map(this->projectionCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
-			memcpy(mappedSubresource.pData, &this->projMat, sizeof(Matrix));
-			
-			this->context->Unmap(this->projectionCBuffer, 0);
-
-			cBuffer[0] = this->projectionCBuffer;
-			this->context->VSSetConstantBuffers(2, 1, cBuffer);
-			this->context->PSSetConstantBuffers(2, 1, cBuffer);
-			this->context->GSSetConstantBuffers(2, 1, cBuffer);
-
+			return this->projMat;
 			break;
 		case TRANSFORM_VIEW:
-			this->viewStack.pop_back();
-			this->viewMat = calcStackVal(this->viewStack);
-			this->invViewMat = this->viewMat.Invert();
-			break;
-		case TRANSFORM_WORLD:
-			this->worldStack.pop_back();
-			this->worldMat = calcStackVal(this->worldStack);
+			return this->viewMat;
 			break;
 		}
+		
+		OutputDebugString("\nInvalid parameters to Renderer::GetTransform()\n");
 	}
-
-	/*bool Renderer::StackHasMatrix(TRANSFORM_TYPE type)
-	{
-		switch(type)
-		{
-		case TRANSFORM_PROJECTION:
-			if(this->projStack.size() == 0)
-			{
-				return false;
-			}
-
-			return true;
-		case TRANSFORM_VIEW:
-			if(this->viewStack.size() == 0)
-			{
-				return false;
-			}
-
-			return true;
-		case TRANSFORM_WORLD:
-			if(this->worldStack.size() == 0)
-			{
-				return false;
-			}
-
-			return true;
-		}
-	}*/
 
 	void Renderer::rebindParticleCBs(void)
 	{
@@ -1121,170 +950,4 @@ namespace NBody
 		this->swapChain->Present(1, 0);
 		this->context->RSSetState(NULL);
 	}
-
-	#pragma region Old debug code
-
-	/*void Renderer::setTransform(TRANSFORM_TYPE type, const XMMATRIX &mat)
-	{
-		XMFLOAT4X4 matVal;
-		XMStoreFloat4x4(&matVal, mat);
-		this->setTransform(type, matVal);
-	}*/
-		
-	/*void Renderer::rebindTransformCBs(void)
-	{
-		this->SetTransform(TRANSFORM_WORLD, this->worldMat);
-		this->SetTransform(TRANSFORM_VIEW, this->Camera.GetView());
-		this->SetTransform(TRANSFORM_PROJECTION, this->projMat);
-	}*/
-
-	//void Renderer::RenderDebugInfo(void)
-	//{
-	//	this->debug_RenderText();
-	//	
-	//	Matrix tmp = this->worldMat;
-	//	
-	//	this->worldMat = Matrix::CreateTranslation(Vector3(0.0f, 0.0f, 0.0f));
-
-	//	/*this->Context->VSSetShader(this->colorVShader, NULL, 0);
-	//	this->Context->PSSetShader(this->colorPShader, NULL, 0);*/
-	//	this->BindShader(SHADER_TYPE_COLOR);
-
-	//	this->rebindTransformCBs();
-
-	//	if(this->options.Axes && this->debugRenderHooked)
-	//	{
-	//		this->Context->IASetInputLayout(this->colorInputLayout);
-	//		this->Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-
-	//		ID3D11Buffer *axesVBufferArr[1] = {this->axesVBuffer};
-	//		ID3D11Buffer *nullVBufferArr[1] = {NULL};
-	//		UINT stride[1] = {sizeof(XMFLOAT4)};
-	//		UINT offset[1] = {0};
-
-	//		this->Context->IASetVertexBuffers(0, 1, axesVBufferArr, stride, offset);
-	//	
-	//		this->SetColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-	//		this->Context->Draw(2, 0); //x axis red
-	//		this->SetColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-	//		this->Context->Draw(2, 2); // y axis green
-	//		this->SetColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
-	//		this->Context->Draw(2, 4); // z axis blue 
-	//	}
-
-	//	this->worldMat = tmp;
-
-	//	/*this->Context->VSSetShader(NULL, NULL, 0);
-	//	this->Context->PSSetShader(NULL, NULL, 0);*/
-	//	this->UnbindShader();
-	//}
-
-	//void Renderer::debug_RenderText(void)
-	//{
-	//	if(!this->debugRenderHooked)
-	//	{
-	//		return;
-	//	}
-
-	//	Matrix tmp = this->projMat;
-	//	this->projMat = Matrix::CreateOrthographic(1.0f, 1.0f, 0.0f, 1.0f);
-
-	//	this->BeginText();
-	//	
-	//	if(this->options.FPS)
-	//	{
-	//		std::wstring FPSTxt = L"frame rate: ";
-	//		FPSTxt = FPSTxt.append( std::to_wstring(timer->GetFramerate()) );
-
-	//		this->RenderText(FPSTxt, 0.0f, 0.0f);
-	//	}
-	//	if(this->options.RawMouseInput && this->inputController->GetCameraMode() == CAMERA_MODE_FPS_CAMERA)
-	//	{
-	//		std::wstring mouseText = L"Mouse Delta (";
-	//		mouseText = mouseText.append( std::to_wstring(this->inputController->GetMouseDeltaX() ) );
-	//		mouseText = mouseText.append( L" , " );
-	//		mouseText = mouseText.append( std::to_wstring(this->inputController->GetMouseDeltaY() ) );
-	//		mouseText = mouseText.append( L")" );
-
-	//		this->RenderText(mouseText, 0.0f, 0.0625f);
-	//	}
-	//	if(this->options.Matrices)
-	//	{
-	//		/*RECTF viewScreenRect;
-	//		viewScreenRect.top = 0.0f;
-	//		viewScreenRect.bottom = 
-	//		this->debug_drawMatrix(this->Camera.GetView(), )*/
-	//	}
-
-	//	this->EndText();
-
-	//	this->projMat = tmp;
-	//	this->SetTransform(TRANSFORM_PROJECTION, this->projMat);
-	//}
-
-	//bool Renderer::debug_init(void)
-	//{
-	//	D3D11_BUFFER_DESC axesVBufferDesc;
-	//	ZeroMemory(&axesVBufferDesc, sizeof(D3D11_BUFFER_DESC));
-	//	axesVBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	//	axesVBufferDesc.ByteWidth = sizeof(XMFLOAT4) * 6;
-	//	axesVBufferDesc.CPUAccessFlags = 0;
-	//	axesVBufferDesc.MiscFlags = 0;
-	//	axesVBufferDesc.StructureByteStride = 0;
-	//	axesVBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-	//	XMFLOAT4 verts[6] = 
-	//	{
-	//		XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
-	//		XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f),
-	//		XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
-	//		XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f),
-	//		XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
-	//		XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f),
-	//	};
-
-	//	D3D11_SUBRESOURCE_DATA subresourceData;
-	//	subresourceData.pSysMem = &verts;
-	//	if(FAILED(this->Device->CreateBuffer(&axesVBufferDesc, &subresourceData, &this->axesVBuffer)))
-	//	{
-	//		OutputDebugString("create axesVBuffer failed");
-	//		return false;
-	//	}
-
-	//	return true;
-	//}
-
-
-	/*void Renderer::CameraTranslateInView(const Vector3 &translation)
-	{
-		Vector3 translation_world = Vector3::TransformNormal(translation, this->GetInvTransform(TRANSFORM_VIEW));
-		this->translation += translation_world;
-
-		this->buildView();
-	}
-
-	void Renderer::CameraTranslateInWorld(const Vector3 &translation)
-	{
-		this->translation += translation;
-
-		this->buildView();
-	}
-
-	void Renderer::CameraRotateInView(const Matrix &mat)
-	{
-		Matrix m_world = mat * this->invViewMat;
-		this->rotation *= m_world;
-
-		this->buildView();
-	}
-
-	void Renderer::CameraRotateInWorld(const Matrix &mat)
-	{
-		this->rotation *= mat;
-
-		this->buildView();
-	}*/
-
-
-#pragma endregion
 }
