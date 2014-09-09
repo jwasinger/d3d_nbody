@@ -45,6 +45,9 @@
     <ClCompile Include="..\src\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MatrixStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\Camera3D.h">
@@ -81,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

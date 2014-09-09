@@ -26,19 +26,19 @@ using namespace DirectX::SimpleMath;
 
 namespace NBody
 {
-	enum TRANSFORM_TYPE : UINT
-	{
-		TRANSFORM_WORLD,
-		TRANSFORM_PROJECTION,
-		TRANSFORM_VIEW,
-	};
-
 	enum SHADER_TYPE
 	{
 		SHADER_TYPE_NONE = 0,
 		SHADER_TYPE_COLOR,
 		SHADER_TYPE_POINT_SPRITE,
 		SHADER_TYPE_TEXTURE,
+	};
+
+	enum TRANSFORM_TYPE : UINT
+	{
+		TRANSFORM_WORLD,
+		TRANSFORM_PROJECTION,
+		TRANSFORM_VIEW,
 	};
 
 	class Renderer
@@ -90,6 +90,9 @@ namespace NBody
 		ID3D11InputLayout *colorInputLayout;
 		ID3D11Buffer *colorCBuffer;
 
+		std::vector<Matrix> worldStack;
+		std::vector<Matrix> projStack;
+		std::vector<Matrix> viewStack;
 		Matrix worldMat;
 		Matrix projMat;
 		Matrix viewMat;
@@ -99,9 +102,7 @@ namespace NBody
 		ID3D11Buffer *worldCBuffer;
 		ID3D11Buffer *viewCBuffer;
 		ID3D11Buffer *projectionCBuffer;
-		std::vector<Matrix> worldStack;
-		std::vector<Matrix> projStack;
-		std::vector<Matrix> viewStack;
+		
 
 		ID3D11RasterizerState *rsDisableCull;
 		ID3D11RasterizerState *rsCullFront;
@@ -137,7 +138,7 @@ namespace NBody
 		void SetColor(const Vector4 &color);
 		void PushMatrix(TRANSFORM_TYPE type, const Matrix &value);
 		void PopMatrix(TRANSFORM_TYPE type);
-		bool StackHasMatrix(TRANSFORM_TYPE type);
+		//bool StackHasMatrix(TRANSFORM_TYPE type);
 		void SetStack(bool enable);
 
 		void SetCullMode(D3D11_CULL_MODE mode);

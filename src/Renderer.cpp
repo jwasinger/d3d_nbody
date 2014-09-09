@@ -846,6 +846,17 @@ namespace NBody
 			this->projStack.pop_back();
 			this->projMat = calcStackVal(this->projStack);
 
+			this->invProjMat = this->projMat.Invert();
+
+			this->context->Map(this->projectionCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
+			memcpy(mappedSubresource.pData, &this->projMat, sizeof(Matrix));
+			
+			this->context->Unmap(this->projectionCBuffer, 0);
+
+			cBuffer[0] = this->projectionCBuffer;
+			this->context->VSSetConstantBuffers(2, 1, cBuffer);
+			this->context->PSSetConstantBuffers(2, 1, cBuffer);
+			this->context->GSSetConstantBuffers(2, 1, cBuffer);
 
 			break;
 		case TRANSFORM_VIEW:
@@ -860,7 +871,7 @@ namespace NBody
 		}
 	}
 
-	bool Renderer::StackHasMatrix(TRANSFORM_TYPE type)
+	/*bool Renderer::StackHasMatrix(TRANSFORM_TYPE type)
 	{
 		switch(type)
 		{
@@ -886,7 +897,7 @@ namespace NBody
 
 			return true;
 		}
-	}
+	}*/
 
 	void Renderer::rebindParticleCBs(void)
 	{
