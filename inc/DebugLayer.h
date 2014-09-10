@@ -6,6 +6,7 @@
 #include "InputController.h"
 #include "Console.h"
 #include "Renderer.h"
+#include "MyMath.h"
 
 namespace NBody
 {

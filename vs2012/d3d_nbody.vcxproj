@@ -78,7 +78,6 @@
     <ClCompile Include="..\src\Renderer.cpp" />
     <ClCompile Include="..\src\TextConsole.cpp" />
     <ClCompile Include="..\src\Timer.cpp" />
-    <ClCompile Include="MatrixStack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\Camera3D.h" />
@@ -88,12 +87,12 @@
     <ClInclude Include="..\inc\DebugLayer.h" />
     <ClInclude Include="..\inc\Error.h" />
     <ClInclude Include="..\inc\InputController.h" />
+    <ClInclude Include="..\inc\MyMath.h" />
     <ClInclude Include="..\inc\NBodySim.h" />
     <ClInclude Include="..\inc\Renderer.h" />
     <ClInclude Include="..\inc\TextConsole.h" />
     <ClInclude Include="..\inc\Timer.h" />
     <ClInclude Include="..\inc\Vertex.h" />
-    <ClInclude Include="MatrixStack.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

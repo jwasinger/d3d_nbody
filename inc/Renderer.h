@@ -128,6 +128,9 @@ namespace NBody
 		void BindShader(SHADER_TYPE type);
 		void UnbindShader(void);
 
+		int GetBBWidth(void) const  { return this->bbWidth; }
+		int GetBBHeight(void) const { return this->bbHeight; }
+
 		SHADER_TYPE GetBoundShader(void) const { return this->boundShader; }
 		
 		void SetColor(const Vector4 &color);

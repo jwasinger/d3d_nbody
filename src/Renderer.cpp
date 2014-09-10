@@ -94,10 +94,6 @@ namespace NBody
 		this->bbWidth = windowRect.right - windowRect.left;
 		this->bbHeight = windowRect.bottom - windowRect.top;
 
-		this->viewStack = std::vector<Matrix>();
-		this->worldStack = std::vector<Matrix>();
-		this->projStack = std::vector<Matrix>();
-
 		HRESULT result;
 
 		result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&this->factory);
@@ -638,6 +634,7 @@ namespace NBody
 		return true;
 	}
 	
+	
 	bool Renderer::isGShaderBound(void)
 	{
 		ID3D11GeometryShader* gShader = NULL;
@@ -846,8 +843,8 @@ namespace NBody
 	
 	void Renderer::BindShader(SHADER_TYPE type)
 	{
-		if(type == this->boundShader)
-			return;
+		/*if(type == this->boundShader)
+			return;*/
 
 		this->boundShader = type;
 
