@@ -18,6 +18,7 @@ const int windowPosX = 300;
 const int windowPosY = 300;
 const int windowWidth = 400;
 const int windowHeight = 400;
+static bool init = false;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void freeAppResources(void);
@@ -29,7 +30,8 @@ void Render(void);
 bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	WNDCLASSEX wc;
-	
+
+
 	// clear out the window class for use
 	ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
@@ -72,6 +74,8 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	GetWindowRect(hWnd, &windowRect);
 
 	inputController = new InputController(windowRect, renderer);
+	if (!inputController->Init(hWnd))
+		return false;
 
 	if(!renderer->Init(windowRect, hWnd))
 		return false;
@@ -80,20 +84,6 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	if(!simulation->Init(renderer->GetDeviceContext(), renderer->GetDevice(), 10))
 		return false;
-
-	if(!inputController->Init(hWnd))
-		return false;
-	
-	/*console = std::shared_ptr<Console>(new NBody::Console());
-	if(!console->Init(
-		renderer, 
-		simulation, 
-		Vector2(0.0f, 0.0f), 
-		Vector2(0.5f, 0.5f), 
-		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top))
-	{
-		return false;
-	}*/
 
 	DebugOptions options;
 	options.RenderAxes = true;
@@ -108,9 +98,8 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return false;
 	}
 	
-	ShellExecute(hWnd, "open", "DebugConsole.exe", NULL, NULL, 0);
-
-	
+	init = true;
+	//ShellExecute(hWnd, "open", "DebugConsole.exe", NULL, NULL, 0);
 	return true;
 }
 
@@ -187,7 +176,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	default:
-		inputController->OnWndProc(message, wParam, lParam);
+		if (init)
+			inputController->OnWndProc(message, wParam, lParam);
 	}
 
 	return DefWindowProc (hWnd, message, wParam, lParam);

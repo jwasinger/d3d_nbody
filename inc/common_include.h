@@ -23,7 +23,15 @@ struct RECTF
 };
 
 const std::wstring appPath = L"C:\\Users\\Jared\\Documents\\Visual Studio 2012\\Projects\\nbody_simulation\\nbody_simulation\\";
+const std::wstring base_path = L"C:\\Users\\Jared\\Documents\\Visual Studio 2012\\Projects\\nbody_simulation\\nbody_simulation\\";
+const std::wstring shader_path 
 const std::wstring fontFileName = L"arial.spritefont";
+
+inline std::wstring GetShaderPath(const std::wstring &shader_name)
+{
+	std::wstring rv = std::wstring(base_path).append(shader_path).append(shader_name);
+	return rv;
+}
 
 inline std::wstring GetFilePath(const std::wstring &fileName)
 {

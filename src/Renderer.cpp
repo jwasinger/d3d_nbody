@@ -242,9 +242,7 @@ namespace NBody
 		particleVBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
 		if(FAILED(this->device->CreateBuffer(&particleVBufferDesc, NULL, &this->particleVBuffer)))
-		{
 			return false;
-		}
 
 		if(!this->createRasterizerStates())
 			return false;
