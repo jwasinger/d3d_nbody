@@ -212,7 +212,7 @@ namespace NBody
 		this->context->RSSetViewports(1, &viewport);
 
 		//load the texture for the particle point sprite
-		if(FAILED(DirectX::CreateWICTextureFromFile(this->device, this->context, GetFilePath(L"particle.bmp").data(), &this->particleTexture, &this->particleTextureSRV)))
+		if(FAILED(DirectX::CreateWICTextureFromFile(this->device, this->context, GetMediaPath(L"particle.bmp").data(), &this->particleTexture, &this->particleTextureSRV)))
 		{
 			OutputDebugString("\nCreateWICTextureFromFile() failed\n");
 			return false;
@@ -258,7 +258,7 @@ namespace NBody
 		try
 		{
 			this->SBatch = new SpriteBatch(this->context);
-			this->SFont = new SpriteFont(this->device, GetFilePath(L"arial.spritefont").data());
+			this->SFont = new SpriteFont(this->device, GetMediaPath(L"arial.spritefont").data());
 		}
 		catch(std::exception e)
 		{
@@ -444,7 +444,9 @@ namespace NBody
 		ID3DBlob *errorCode = nullptr;
 
 		//create Point Sprite shaders ----------------------------------------------------------------------------------------------------
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"PointSprite.hlsl").data(), nullptr, nullptr, "VShader", "vs_5_0", flags1, 0, &vShaderCode, &errorCode)))
+		HRESULT res;
+
+		if(FAILED(res = D3DCompileFromFile(GetShaderPath(L"PointSprite.hlsl").data(), nullptr, nullptr, "VShader", "vs_5_0", flags1, 0, &vShaderCode, &errorCode)))
 		{
 			SafeRelease<ID3DBlob>(&vShaderCode);	
 			if(errorCode)
@@ -456,7 +458,7 @@ namespace NBody
 			return false;
 		}
 		
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"PointSprite.hlsl").data(), nullptr, nullptr, "PShader", "ps_5_0", flags1, 0, &pShaderCode, &errorCode)))
+		if(FAILED(res = D3DCompileFromFile(GetShaderPath(L"PointSprite.hlsl").data(), nullptr, nullptr, "PShader", "ps_5_0", flags1, 0, &pShaderCode, &errorCode)))
 		{
 			SafeRelease<ID3DBlob>(&pShaderCode);	
 			if(errorCode)
@@ -468,7 +470,7 @@ namespace NBody
 			return false;
 		}
 
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"PointSprite.hlsl").data(), nullptr, nullptr, "GShader", "gs_5_0", flags1, 0, &gShaderCode, &errorCode)))
+		if(FAILED(res = D3DCompileFromFile(GetShaderPath(L"PointSprite.hlsl").data(), nullptr, nullptr, "GShader", "gs_5_0", flags1, 0, &gShaderCode, &errorCode)))
 		{
 			SafeRelease<ID3DBlob>(&pShaderCode);	
 			if(errorCode)
@@ -518,7 +520,7 @@ namespace NBody
 
 		//create Texture shaders------------------------------------------------------------------------------------------------------------
 		
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"Texture.hlsl").data(), nullptr, nullptr, "VShader", "vs_5_0", flags1, 0, &vShaderCode, &errorCode)))
+		if(FAILED(D3DCompileFromFile(GetShaderPath(L"Texture.hlsl").data(), nullptr, nullptr, "VShader", "vs_5_0", flags1, 0, &vShaderCode, &errorCode)))
 		{
 			SafeRelease<ID3DBlob>(&vShaderCode);	
 			if(errorCode)
@@ -530,7 +532,7 @@ namespace NBody
 			return false;
 		}
 		
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"Texture.hlsl").data(), nullptr, nullptr, "PShader", "ps_5_0", flags1, 0, &pShaderCode, &errorCode)))
+		if(FAILED(D3DCompileFromFile(GetShaderPath(L"Texture.hlsl").data(), nullptr, nullptr, "PShader", "ps_5_0", flags1, 0, &pShaderCode, &errorCode)))
 		{
 			SafeRelease<ID3DBlob>(&pShaderCode);	
 			if(errorCode)
@@ -576,7 +578,7 @@ namespace NBody
 
 		//create color shaders and input layout ---------------------------------------------------------------------------------------------
 
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"Colored.hlsl").data(), nullptr, nullptr, "VShader", "vs_5_0", flags1, 0, &vShaderCode, &errorCode)))
+		if(FAILED(D3DCompileFromFile(GetShaderPath(L"Colored.hlsl").data(), nullptr, nullptr, "VShader", "vs_5_0", flags1, 0, &vShaderCode, &errorCode)))
 		{
 			SafeRelease<ID3DBlob>(&vShaderCode);	
 			if(errorCode)
@@ -588,7 +590,7 @@ namespace NBody
 			return false;
 		}
 		
-		if(FAILED(D3DCompileFromFile(GetFilePath(L"Colored.hlsl").data(), nullptr, nullptr, "PShader", "ps_5_0", flags1, 0, &pShaderCode, &errorCode)))
+		if(FAILED(D3DCompileFromFile(GetShaderPath(L"Colored.hlsl").data(), nullptr, nullptr, "PShader", "ps_5_0", flags1, 0, &pShaderCode, &errorCode)))
 		{
 			SafeRelease<ID3DBlob>(&pShaderCode);	
 			if(errorCode)

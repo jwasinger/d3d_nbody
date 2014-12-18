@@ -39,7 +39,7 @@ namespace NBody
 		this->context = deviceContext;
 		this->numBodies = numBodies;
 
-		if(!this->createComputeShader(GetFilePath(L"compute.hlsl").data()))
+		if(!this->createComputeShader(GetShaderPath(L"compute.hlsl").data()))
 			return false;
 	
 		//create particle structured buffers -----------------------------------------------------------------------------------------
