@@ -1,6 +1,18 @@
 #ifndef LOG_H
 #define LOG_H
 
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include <errno.h>
+#include <string>
+#include <algorithm>
+
+#include "common_include.h"
+#include "misc.h"
+
+
+
 /*
 *
 * create the log file, or if NULL is passed only output to stderr

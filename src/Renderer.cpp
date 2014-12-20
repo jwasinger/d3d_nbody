@@ -212,7 +212,7 @@ namespace NBody
 		this->context->RSSetViewports(1, &viewport);
 
 		//load the texture for the particle point sprite
-		if(FAILED(DirectX::CreateWICTextureFromFile(this->device, this->context, GetMediaPath(L"particle.bmp").data(), &this->particleTexture, &this->particleTextureSRV)))
+		if(FAILED(result = DirectX::CreateWICTextureFromFile(this->device, this->context, GetMediaPath(L"particle.bmp").data(), &this->particleTexture, &this->particleTextureSRV)))
 		{
 			OutputDebugString("\nCreateWICTextureFromFile() failed\n");
 			return false;
@@ -228,9 +228,10 @@ namespace NBody
 		quadBufferDesc.StructureByteStride = sizeof(NBody::TexturedVertex);
 		quadBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 
-		if(FAILED(this->device->CreateBuffer(&quadBufferDesc, nullptr, &this->quadVBuffer)))
+		if(FAILED(result = this->device->CreateBuffer(&quadBufferDesc, nullptr, &this->quadVBuffer)))
 			return false;
 
+		this->numParticles = 10;
 		//create a vertex buffer for the particle point sprites
 		D3D11_BUFFER_DESC particleVBufferDesc;
 		ZeroMemory(&particleVBufferDesc, sizeof(D3D11_BUFFER_DESC));
@@ -241,7 +242,7 @@ namespace NBody
 		particleVBufferDesc.StructureByteStride = sizeof(unsigned int);
 		particleVBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
-		if(FAILED(this->device->CreateBuffer(&particleVBufferDesc, NULL, &this->particleVBuffer)))
+		if(FAILED(result = this->device->CreateBuffer(&particleVBufferDesc, NULL, &this->particleVBuffer)))
 			return false;
 
 		if(!this->createRasterizerStates())
@@ -633,7 +634,6 @@ namespace NBody
 
 		return true;
 	}
-	
 	
 	bool Renderer::isGShaderBound(void)
 	{

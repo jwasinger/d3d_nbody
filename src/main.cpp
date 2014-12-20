@@ -3,6 +3,7 @@
 #include "Timer.h"
 #include "InputController.h"
 #include "DebugLayer.h"
+#include "log.h"
 
 using namespace NBody;
 
@@ -29,8 +30,11 @@ void Render(void);
 
 bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	WNDCLASSEX wc;
+	//create the logger first since everything forthecoming will depend on it
+	/*if (!init_log(NULL))
+		return false;*/
 
+	WNDCLASSEX wc;
 
 	// clear out the window class for use
 	ZeroMemory(&wc, sizeof(WNDCLASSEX));
@@ -128,6 +132,10 @@ void Render(void)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
+	if (!init_log(NULL))
+		return -1;
+
+	log_str("Hello world! %s", "poop");
 	if(!Init(NULL, hInstance, hPrevInstance, pScmdline, iCmdshow))
 	{
 		return 1;
@@ -159,10 +167,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 void freeAppResources(void)
 {
-	delete debugLayer;
-	delete inputController;
-	delete renderer;
-	delete simulation;
+	SafeDelete(&debugLayer);
+	SafeDelete(&inputController);
+	SafeDelete(&renderer);
+	SafeDelete(&simulation);
+	close_log();
 	return;
 }
 

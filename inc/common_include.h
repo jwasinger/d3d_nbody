@@ -12,7 +12,7 @@
 #include <iterator>
 #include <iostream>
 #include <vector>
-//#include "log.h"
+#include <comdef.h>
 
 template <class T> void SafeRelease(T **ppT)
 {
@@ -21,6 +21,15 @@ template <class T> void SafeRelease(T **ppT)
         (*ppT)->Release();
         *ppT = nullptr;
     }
+};
+
+template <class T> void SafeDelete(T **ppT)
+{
+	if (*ppT)
+	{
+		delete(*ppT);
+		*ppT = nullptr;
+	}
 };
 
 struct RECTF
@@ -58,6 +67,7 @@ inline std::vector<std::wstring> split(const std::wstring &str, wchar_t delim)
 		}
 	}
 
+	elems.push_back(cur_str);
 	return elems;
 }
 
@@ -66,18 +76,24 @@ inline std::wstring GetMediaPath(const std::wstring &file_name)
 	std::wstring file_type = split(file_name, '.').back();
 	
 	//only support bmp files for now
-	if (file_type == std::wstring((wchar_t *)"bmp"))
+	if (file_type == std::wstring(L"bmp"))
 	{
-		return std::wstring(base_path).append(media_path).append((wchar_t *)"\\images\\").append(file_name);
+		return std::wstring(base_path).append(media_path).append(L"\\images\\").append(file_name);
 	}
-	else if (file_type == std::wstring((wchar_t *)"spritefont"))
+	else if (file_type == std::wstring(L"spritefont"))
 	{
-		return std::wstring(base_path).append(media_path).append((wchar_t *)"\\fonts\\").append(file_name);
+		return std::wstring(base_path).append(media_path).append(L"\\fonts\\").append(file_name);
 	}
 	else
 	{
 		return std::wstring(); //file type not recognized
 	}
+}
+
+inline std::string get_err_str(HRESULT hres)
+{
+	_com_error err(hres);
+	return std::string(err.ErrorMessage());
 }
 
 namespace NBody

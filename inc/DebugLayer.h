@@ -7,6 +7,9 @@
 #include "Console.h"
 #include "Renderer.h"
 #include "MyMath.h"
+#include "log.h"
+#include "misc.h"
+#include "common_include.h"
 
 namespace NBody
 {
@@ -48,6 +51,11 @@ namespace NBody
 
 		ID3D11Buffer *axesVBuffer;
 
+		ID3D11Buffer *test_tri_vbuffer;
+		
+		bool create_test_triangle(void);
+		void render_test_triangle(void);
+		void free_test_triangle(void);
 	};
 }
 #endif

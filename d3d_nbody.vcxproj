@@ -69,31 +69,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Camera3D.cpp" />
-    <ClCompile Include="..\src\Console.cpp" />
-    <ClCompile Include="..\src\DebugConsoleHost.cpp" />
-    <ClCompile Include="..\src\DebugLayer.cpp" />
-    <ClCompile Include="..\src\InputController.cpp" />
-    <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\NBodySim.cpp" />
-    <ClCompile Include="..\src\Renderer.cpp" />
-    <ClCompile Include="..\src\TextConsole.cpp" />
-    <ClCompile Include="..\src\Timer.cpp" />
+    <None Include="DirectXTK\DirectXTK_Desktop_2012.vcxproj.filters" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\inc\Camera3D.h" />
-    <ClInclude Include="..\inc\common_include.h" />
-    <ClInclude Include="..\inc\Console.h" />
-    <ClInclude Include="..\inc\DebugConsoleHost.h" />
-    <ClInclude Include="..\inc\DebugLayer.h" />
-    <ClInclude Include="..\inc\Error.h" />
-    <ClInclude Include="..\inc\InputController.h" />
-    <ClInclude Include="..\inc\MyMath.h" />
-    <ClInclude Include="..\inc\NBodySim.h" />
-    <ClInclude Include="..\inc\Renderer.h" />
-    <ClInclude Include="..\inc\TextConsole.h" />
-    <ClInclude Include="..\inc\Timer.h" />
-    <ClInclude Include="..\inc\Vertex.h" />
+    <ClInclude Include="inc\Camera3D.h" />
+    <ClInclude Include="inc\common_include.h" />
+    <ClInclude Include="inc\Console.h" />
+    <ClInclude Include="inc\DebugConsoleHost.h" />
+    <ClInclude Include="inc\DebugLayer.h" />
+    <ClInclude Include="inc\Error.h" />
+    <ClInclude Include="inc\InputController.h" />
+    <ClInclude Include="inc\log.h" />
+    <ClInclude Include="inc\misc.h" />
+    <ClInclude Include="inc\MyMath.h" />
+    <ClInclude Include="inc\NBodySim.h" />
+    <ClInclude Include="inc\Renderer.h" />
+    <ClInclude Include="inc\TextConsole.h" />
+    <ClInclude Include="inc\Timer.h" />
+    <ClInclude Include="inc\Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Camera3D.cpp" />
+    <ClCompile Include="src\Console.cpp" />
+    <ClCompile Include="src\DebugConsoleHost.cpp" />
+    <ClCompile Include="src\DebugLayer.cpp" />
+    <ClCompile Include="src\InputController.cpp" />
+    <ClCompile Include="src\log.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\misc.cpp" />
+    <ClCompile Include="src\NBodySim.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\TextConsole.cpp" />
+    <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

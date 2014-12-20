@@ -1,52 +1,63 @@
-﻿Build started 12/17/2014 9:17:56 PM.
-     1>Project "C:\Users\Jared\projects\d3d_nbody\visual_studio\d3d_nbody.vcxproj" on node 2 (Rebuild target(s)).
+﻿Build started 12/20/2014 12:58:31 AM.
+     1>Project "C:\Users\Jared\projects\d3d_nbody\d3d_nbody.vcxproj" on node 2 (Rebuild target(s)).
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(364,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\src\Camera3D.cpp ..\src\Console.cpp ..\src\DebugConsoleHost.cpp ..\src\DebugLayer.cpp ..\src\InputController.cpp ..\src\main.cpp ..\src\NBodySim.cpp ..\src\Renderer.cpp ..\src\TextConsole.cpp ..\src\Timer.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt src\Camera3D.cpp src\Console.cpp src\DebugConsoleHost.cpp src\DebugLayer.cpp src\InputController.cpp src\log.cpp src\main.cpp src\misc.cpp src\NBodySim.cpp src\Renderer.cpp src\TextConsole.cpp src\Timer.cpp
          Timer.cpp
          TextConsole.cpp
          Renderer.cpp
-     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(48): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(57): warning C4018: '<' : signed/unsigned mismatch
      1>c:\users\jared\projects\d3d_nbody\src\renderer.cpp(206): warning C4244: '=' : conversion from 'int' to 'FLOAT', possible loss of data
      1>c:\users\jared\projects\d3d_nbody\src\renderer.cpp(207): warning C4244: '=' : conversion from 'int' to 'FLOAT', possible loss of data
          NBodySim.cpp
-     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(48): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(57): warning C4018: '<' : signed/unsigned mismatch
      1>c:\users\jared\projects\d3d_nbody\src\nbodysim.cpp(27): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>c:\users\jared\projects\d3d_nbody\src\nbodysim.cpp(191): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+         misc.cpp
+     1>c:\users\jared\projects\d3d_nbody\src\misc.cpp(8): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\jared\projects\d3d_nbody\src\misc.cpp(31): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\jared\projects\d3d_nbody\src\misc.cpp(55): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\jared\projects\d3d_nbody\src\misc.cpp(77): warning C4018: '<' : signed/unsigned mismatch
          main.cpp
-     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(48): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(57): warning C4018: '<' : signed/unsigned mismatch
+         log.cpp
+     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(57): warning C4018: '<' : signed/unsigned mismatch
          InputController.cpp
-     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(48): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(57): warning C4018: '<' : signed/unsigned mismatch
      1>c:\users\jared\projects\d3d_nbody\src\inputcontroller.cpp(165): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>c:\users\jared\projects\d3d_nbody\src\inputcontroller.cpp(193): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
          DebugLayer.cpp
-     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(48): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\jared\projects\d3d_nbody\src\debuglayer.cpp(180): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(57): warning C4018: '<' : signed/unsigned mismatch
          DebugConsoleHost.cpp
          Console.cpp
-     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(48): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\jared\projects\d3d_nbody\inc\common_include.h(57): warning C4018: '<' : signed/unsigned mismatch
      1>c:\users\jared\projects\d3d_nbody\src\console.cpp(170): warning C4244: '=' : conversion from 'double' to 'LONG', possible loss of data
      1>c:\users\jared\projects\d3d_nbody\src\console.cpp(171): warning C4244: '=' : conversion from 'double' to 'LONG', possible loss of data
      1>c:\users\jared\projects\d3d_nbody\src\console.cpp(172): warning C4244: '=' : conversion from 'double' to 'LONG', possible loss of data
      1>c:\users\jared\projects\d3d_nbody\src\console.cpp(173): warning C4244: '=' : conversion from 'double' to 'LONG', possible loss of data
          Camera3D.cpp
          Generating Code...
-     1>c:\users\jared\projects\d3d_nbody\src\renderer.cpp(429): warning C4715: 'NBody::Renderer::GetInvTransform' : not all control paths return a value
+     1>c:\users\jared\projects\d3d_nbody\src\debuglayer.cpp(113): warning C4715: 'NBody::DebugLayer::create_test_triangle' : not all control paths return a value
+     1>c:\users\jared\projects\d3d_nbody\src\renderer.cpp(430): warning C4715: 'NBody::Renderer::GetInvTransform' : not all control paths return a value
      1>c:\users\jared\projects\d3d_nbody\src\renderer.cpp(726): warning C4715: 'NBody::Renderer::GetTransform' : not all control paths return a value
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Jared\projects\d3d_nbody\visual_studio\\bin\(Configuration)$\d3d_nbody.exe" /INCREMENTAL /NOLOGO dxgi.lib d3d11.lib DirectXTK_Debug.lib d3dcompiler.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Jared\projects\d3d_nbody\visual_studio\\bin\(Configuration)$\d3d_nbody.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Jared\projects\d3d_nbody\visual_studio\\bin\(Configuration)$\d3d_nbody.lib" /MACHINE:X86 Debug\Camera3D.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Jared\projects\d3d_nbody\\bin\(Configuration)$\d3d_nbody.exe" /INCREMENTAL /NOLOGO dxgi.lib d3d11.lib DirectXTK_Debug.lib d3dcompiler.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Jared\projects\d3d_nbody\\bin\(Configuration)$\d3d_nbody.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Jared\projects\d3d_nbody\\bin\(Configuration)$\d3d_nbody.lib" /MACHINE:X86 Debug\Camera3D.obj
          Debug\Console.obj
          Debug\DebugConsoleHost.obj
          Debug\DebugLayer.obj
          Debug\InputController.obj
+         Debug\log.obj
          Debug\main.obj
+         Debug\misc.obj
          Debug\NBodySim.obj
          Debug\Renderer.obj
          Debug\TextConsole.obj
          Debug\Timer.obj
-         d3d_nbody.vcxproj -> C:\Users\Jared\projects\d3d_nbody\visual_studio\\bin\(Configuration)$\d3d_nbody.exe
-     1>Done Building Project "C:\Users\Jared\projects\d3d_nbody\visual_studio\d3d_nbody.vcxproj" (Rebuild target(s)).
+     1>misc.obj : error LNK2005: "class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > __cdecl get_err_str(long)" (?get_err_str@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@J@Z) already defined in DebugLayer.obj
+     1>Renderer.obj : error LNK2005: "class std::vector<class std::basic_string<wchar_t,struct std::char_traits<wchar_t>,class std::allocator<wchar_t> >,class std::allocator<class std::basic_string<wchar_t,struct std::char_traits<wchar_t>,class std::allocator<wchar_t> > > > __cdecl split(class std::basic_string<wchar_t,struct std::char_traits<wchar_t>,class std::allocator<wchar_t> > const &,wchar_t)" (?split@@YA?AV?$vector@V?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@V?$allocator@V?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@@2@@std@@ABV?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@2@_W@Z) already defined in misc.obj
+     1>C:\Users\Jared\projects\d3d_nbody\\bin\(Configuration)$\d3d_nbody.exe : fatal error LNK1169: one or more multiply defined symbols found
+     1>Done Building Project "C:\Users\Jared\projects\d3d_nbody\d3d_nbody.vcxproj" (Rebuild target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:15.28
+Time Elapsed 00:00:17.72

@@ -84,6 +84,37 @@ namespace NBody
 		return false;
 	}
 
+	bool DebugLayer::create_test_triangle(void)
+	{
+		HRESULT res;
+		D3D11_BUFFER_DESC buf_desc;
+		D3D11_SUBRESOURCE_DATA initial_data;
+		Vector3 verts[3];
+
+		buf_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		buf_desc.ByteWidth = sizeof(Vector3) * 3;
+		buf_desc.CPUAccessFlags = 0;
+		buf_desc.MiscFlags = 0;
+		buf_desc.StructureByteStride = 0;
+		buf_desc.Usage = D3D11_USAGE_DEFAULT;
+
+		memset(&initial_data, 0, sizeof(D3D11_SUBRESOURCE_DATA));
+		initial_data.pSysMem = &verts;
+		
+		if (FAILED(res = this->renderer->GetDevice()->CreateBuffer(
+			&buf_desc,
+			&initial_data,
+			&this->test_tri_vbuffer)))
+		{
+			log_str("CreateBuffer error: %s\n", get_err_str(res));
+			return false;
+		}
+	
+	}
+	
+	void render_test_triangle(void);
+	void free_test_triangle(void);
+
 	/*void updatePipe(void)
 	{
 		if(!clientConnected)
@@ -149,15 +180,12 @@ namespace NBody
 			this->debug_drawMatrix(this->Camera.GetView(), )*/
 		}
 		
-
 		this->renderer->EndText();
 
 		/*this->projMat = tmp;
 		this->SetTransform(TRANSFORM_PROJECTION, this->projMat);*/
 
 		//this->console->Render();
-
-		
 
 		if(this->debugOptions.RenderAxes)
 		{
@@ -168,16 +196,17 @@ namespace NBody
 			Matrix rot = this->renderer->GetInvTransform(TRANSFORM_TYPE::TRANSFORM_VIEW);//).Translation(Vector3(0.0f));
 			rot.Translation(Vector3(0.0f));
 
-			Matrix transform = Matrix::CreateScale(0.25f, 0.25f, 1.0f) * rot * Matrix::CreateTranslation(-0.5f, 0.5f, 0.5f);
+			Matrix transform = Matrix::CreateScale(0.25f, 0.25f, 1.0f) * rot * Matrix::CreateTranslation(0.1f, 0.6f, 0.5f);
 			
 			this->renderer->SetTransform(TRANSFORM_TYPE::TRANSFORM_WORLD, transform);
 			
 			//projecting in wrong direction in z axis for some reason
-			Matrix proj = NBody::CreateOrthographicLH(
-				this->renderer->GetBBWidth(), 
-				this->renderer->GetBBHeight(),
+			Matrix proj = NBody::CreateOrthographicOffCenterLH(0.0f, 1.0f, 0.0f, 1.0f, 0.1f, 1.0f);
+			/*Matrix proj = NBody::CreateOrthographicLH(
+				2,//this->renderer->GetBBWidth(), 
+				2,//this->renderer->GetBBHeight(),
 				0.1f, 
-				1.0f);
+				1.0f);*/
 
 			this->renderer->SetTransform(TRANSFORM_PROJECTION, proj);
 
