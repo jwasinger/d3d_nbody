@@ -50,13 +50,14 @@ void log_str(char *format, ...)
 	for (int i = 1; i < n; i++)
 	{
 		val = va_arg(args, char *);
-		sprintf_s(buf, strlen(strs[i].data()), strs[i].data(), val);
-		buf[strlen(strs[i].data())] = '\0';
+		sprintf_s(buf, 256, strs[i].data(), val);
 		output.append(buf);
 	}
 	va_end(args);
 
-	printf("%s\n", output);
+	OutputDebugString(output.data());
+	OutputDebugString("\n");
+	//printf("%s\n", output);
 	return;
 }
 

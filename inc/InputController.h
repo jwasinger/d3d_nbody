@@ -24,6 +24,10 @@ namespace NBody
 		MOTION_STATE_LEFT = 2,
 		MOTION_STATE_BACK = 3,
 		MOTION_STATE_RIGHT = 4,
+		MOTION_STATE_ROT_RIGHT = 5,
+		MOTION_STATE_ROT_LEFT = 6,
+		MOTION_STATE_ROT_UP = 7,
+		MOTION_STATE_ROT_DOWN = 8,
 	};
 
 	class InputController
@@ -63,6 +67,7 @@ namespace NBody
 		void FPSMouseUpdate(int x, int y);
 		void onKeyDown(WPARAM wParam);
 		void onKeyUp(WPARAM wParam);
+		Vector3 __transform_local(Vector3 &v);
 	};
 }
 #endif

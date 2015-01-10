@@ -14,8 +14,8 @@
 #include <PrimitiveBatch.h>
 #include <d3dcompiler.h>
 
-
 #include "common_include.h"
+#include "media.h"
 #include "Vertex.h"
 #include "Camera3D.h"
 
@@ -100,6 +100,7 @@ namespace NBody
 		ID3D11Buffer *viewCBuffer;
 		ID3D11Buffer *projectionCBuffer;
 		
+		Camera3D camera;
 
 		ID3D11RasterizerState *rsDisableCull;
 		ID3D11RasterizerState *rsCullFront;
@@ -139,6 +140,7 @@ namespace NBody
 		Matrix GetTransform(TRANSFORM_TYPE type) const;
 		Matrix GetInvTransform(TRANSFORM_TYPE type) const; //invert the result of multiplying all matrices on the matrix stack
 		
+		Camera3D &GetCamera(void) { return this->camera; }
 		void SetCullMode(D3D11_CULL_MODE mode);
 
 		void BeginText(void);

@@ -192,12 +192,13 @@ namespace NBody
 			//axes should be transformed so that they appear in the upper lefthand corner of the screen
 			//axes should take up one quarter of the screen when the orientation of the view is such that it is aligned
 			//with the world x,y,z axes
-
+			Matrix old_view = this->renderer->GetTransform(TRANSFORM_VIEW);
 			Matrix rot = this->renderer->GetInvTransform(TRANSFORM_TYPE::TRANSFORM_VIEW);//).Translation(Vector3(0.0f));
 			rot.Translation(Vector3(0.0f));
 
 			Matrix transform = Matrix::CreateScale(0.25f, 0.25f, 1.0f) * rot * Matrix::CreateTranslation(0.1f, 0.6f, 0.5f);
 			
+			this->renderer->SetTransform(TRANSFORM_VIEW, Matrix::Identity());
 			this->renderer->SetTransform(TRANSFORM_TYPE::TRANSFORM_WORLD, transform);
 			
 			//projecting in wrong direction in z axis for some reason
@@ -209,7 +210,6 @@ namespace NBody
 				1.0f);*/
 
 			this->renderer->SetTransform(TRANSFORM_PROJECTION, proj);
-
 			this->renderer->BindShader(SHADER_TYPE_COLOR);
 
 			//draw axes
@@ -229,6 +229,8 @@ namespace NBody
 
 			this->renderer->SetColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 			this->renderer->GetDeviceContext()->Draw(2, 4);
+
+			this->renderer->SetTransform(TRANSFORM_VIEW, old_view);
 		}
 	}
 }

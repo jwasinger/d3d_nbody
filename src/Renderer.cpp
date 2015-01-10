@@ -42,6 +42,7 @@ namespace NBody
 		this->rsCullFront = nullptr;
 		this->rsDefault = nullptr;
 		this->defaultSampler = nullptr;
+		this->camera = Camera3D();
 	}
 
 	Renderer::~Renderer()
@@ -938,6 +939,7 @@ namespace NBody
 
 		float color[4] = {0.5f, 0.5f, 0.0f, 0.0f};
 		this->context->ClearRenderTargetView(this->RTView, color);
+		this->SetTransform(TRANSFORM_VIEW, this->camera.GetView());
 
 		//this->context->RSSetState(this->rsDisableCull);
 	}

@@ -4,6 +4,7 @@
 #include "InputController.h"
 #include "DebugLayer.h"
 #include "log.h"
+#include "ProcSphere.h"
 
 using namespace NBody;
 
@@ -14,6 +15,7 @@ NBodySim *simulation;
 Renderer *renderer;
 InputController *inputController;
 DebugLayer *debugLayer;
+ProcSphere *p_sphere = NULL;
 
 const int windowPosX = 300;
 const int windowPosY = 300;
@@ -102,6 +104,13 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return false;
 	}
 	
+	p_sphere = new ProcSphere();
+	if (!p_sphere->Init(renderer))
+		return false;
+	
+	if (!p_sphere->Generate(0))
+		return false;
+
 	init = true;
 	//ShellExecute(hWnd, "open", "DebugConsole.exe", NULL, NULL, 0);
 	return true;
@@ -125,6 +134,8 @@ void Render(void)
 	//renderer->RenderDebugInfo();
 	debugLayer->Render();
 	
+	p_sphere->Render();
+
 	//renderer->RenderParticles();
 
 	renderer->EndRender();
@@ -134,8 +145,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 {
 	if (!init_log(NULL))
 		return -1;
-
-	log_str("Hello world! %s", "poop");
+	
 	if(!Init(NULL, hInstance, hPrevInstance, pScmdline, iCmdshow))
 	{
 		return 1;

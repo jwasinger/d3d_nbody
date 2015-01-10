@@ -44,7 +44,5 @@ PS_INPUT VShader( VS_INPUT input )
 
 float4 PShader( PS_INPUT input ) : SV_TARGET
 {
-	//return color;
-
-	return float4(0.5f, 0.5f, 0.5f, 1.0f);
+	return color;
 }

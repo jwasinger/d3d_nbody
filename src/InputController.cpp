@@ -162,34 +162,22 @@ namespace NBody
 		this->mouseDeltaX = x;
 		this->mouseDeltaY = y;
 
-		Vector3 mouseDelta(this->mouseDeltaX, -this->mouseDeltaY, 0.0f);
-
-		/*Matrix mouseDeltaMat = Matrix::Identity();
-		mouseDeltaMat.m[3][0] = mouseDelta.x;
-		mouseDeltaMat.m[3][1] = mouseDelta.y;
-		mouseDeltaMat.m[3][2] = mouseDelta.z;
-		mouseDeltaMat.m[3][3] = mouseDelta.w;*/
-
-		//transform the mouse delta vector from view space to world space coords
-		//mouseDeltaMat = mouseDeltaMat * this->camera->GetInvView();
+		Vector3 mouseDelta(-this->mouseDeltaX, this->mouseDeltaY, 0.0f);
+		Matrix view = this->renderer->GetCamera().GetView();
 		
-		//transform the mouse delta vector from view space to world space coords
-		mouseDelta = Vector3::TransformNormal(mouseDelta, this->renderer->GetInvTransform(TRANSFORM_VIEW));
+		this->renderer->GetCamera().RotateAxisAngle(view.Right(), mouseDamping*this->mouseDeltaY);
+		this->renderer->GetCamera().RotateAxisAngle(view.Up(), mouseDamping*this->mouseDeltaX);
+	}
 
-		Vector3 rotationDir = mouseDelta.Cross(this->renderer->GetTransform(TRANSFORM_VIEW).Forward());
-		rotationDir.Normalize();
-
-		float rotAngle = rotationDir.Length() * this->mouseDamping;
-		
-		Quaternion rot = Quaternion::CreateFromAxisAngle(rotationDir, rotAngle);
-		Matrix rotMat = Matrix::CreateFromQuaternion(rot);
-		//Matrix rotMat = Matrix::CreateFromAxisAngle(rotationDir, rotAngle);
-		//this->renderer->CameraRotateInWorld(rotMat);
+	Vector3 InputController::__transform_local(Vector3 &v)
+	{
+		Matrix inv_view = this->renderer->GetInvTransform(TRANSFORM_VIEW);
+		return Vector3::TransformNormal(v, inv_view);
 	}
 
 	void InputController::Update(double ms)
 	{
-		Matrix translation = Matrix::Identity();
+		/*Matrix translation = Matrix::Identity();
 		float dist = (ms/1000.0)*this->cameraMoveSpeed;
 
 		switch(this->motionState)
@@ -211,15 +199,60 @@ namespace NBody
 
 			//this->renderer->CameraTranslateInView(Vector3(0.0f, 0.0f, dist));
 			break;
-		}
+		}*/
 
-		
+		float dist = (ms / 1000.0)*this->cameraMoveSpeed;
+		Matrix cur_transform = this->renderer->GetTransform(TRANSFORM_VIEW);
+		Matrix new_transform = Matrix::Identity();
+		Matrix inv_view = this->renderer->GetInvTransform(TRANSFORM_VIEW);
+		Matrix rot_x = Matrix::CreateRotationX(0.1f);
+		Vector3 axis;
+
+		switch (this->motionState)
+		{
+		case MOTION_STATE_FORWARD:
+			new_transform = inv_view * Matrix::CreateTranslation(0.0f, 0.0f, dist);
+			cur_transform *= new_transform;
+			this->renderer->SetTransform(TRANSFORM_VIEW, 
+					cur_transform);
+			break;
+		case MOTION_STATE_BACK:
+			new_transform = inv_view * Matrix::CreateTranslation(0.0f, 0.0f, -dist);
+			cur_transform *= new_transform;
+			this->renderer->SetTransform(TRANSFORM_VIEW,
+				cur_transform);
+			break;
+		case MOTION_STATE_ROT_LEFT:
+			axis = __transform_local(Vector3(0, 0, 1));
+			new_transform = cur_transform * Matrix::CreateFromAxisAngle(axis, 0.1f);
+			this->renderer->SetTransform(TRANSFORM_VIEW,
+				new_transform);
+			break;
+		case MOTION_STATE_ROT_RIGHT:
+			axis = __transform_local(Vector3(0, 0, 1));
+			new_transform = cur_transform * Matrix::CreateFromAxisAngle(axis, -0.1f);
+			this->renderer->SetTransform(TRANSFORM_VIEW,
+				new_transform);
+			break;
+		case MOTION_STATE_ROT_DOWN:
+			axis = __transform_local(Vector3(1, 0, 0));
+			new_transform = cur_transform * Matrix::CreateFromAxisAngle(axis, 0.1f);
+			this->renderer->SetTransform(TRANSFORM_VIEW,
+				new_transform);
+			break;
+		case MOTION_STATE_ROT_UP:
+			axis = __transform_local(Vector3(1, 0, 0));
+			new_transform = cur_transform * Matrix::CreateFromAxisAngle(axis, -0.1f);
+			this->renderer->SetTransform(TRANSFORM_VIEW,
+				new_transform);
+			break;
+		}
 	}	
 
 	//Description of control scheme:
 	//'w','a','s','d' move forward, right, back, left respectively
 	//'q', toggle between camera modes
-	void InputController::onKeyDown(WPARAM wParam)
+	/*void InputController::onKeyDown(WPARAM wParam)
 	{
 		if(wParam == 0x51) // 'q' key
 		{
@@ -258,11 +291,56 @@ namespace NBody
 		{
 			this->motionState = MOTION_STATE_RIGHT;
 		}
+	}*/
+
+	void InputController::onKeyDown(WPARAM wParam)
+	{
+		switch (wParam)
+		{
+		case VK_UP:
+			this->motionState = MOTION_STATE_FORWARD;
+			break;
+		case VK_DOWN:
+			this->motionState = MOTION_STATE_BACK;
+			break;
+		case 0x57: // 'w' key
+			this->motionState = MOTION_STATE_ROT_DOWN;
+			break;
+		case 0x41: // 'a' key
+			this->motionState = MOTION_STATE_ROT_LEFT;
+			break;
+		case 0x53:
+			this->motionState = MOTION_STATE_ROT_UP;
+			break;
+		case 0x44: // 'd' key
+			this->motionState = MOTION_STATE_ROT_RIGHT;
+			break;
+		case 0x51:
+			if (this->cameraMode == CAMERA_MODE_FPS_CAMERA)
+			{
+				this->cameraMode = CAMERA_MODE_STATIC_CAMERA;
+				ShowCursor(TRUE);
+			}
+			else if (this->cameraMode == CAMERA_MODE_STATIC_CAMERA)
+			{
+				this->cameraMode = CAMERA_MODE_FPS_CAMERA;
+				SetCursorPos(
+					this->windowRect.left + (int)(0.5f * (float)(this->windowWidth)),
+					this->windowRect.top + (int)(0.5f * (float)(this->windowHeight)));
+
+#ifdef _DEBUG
+				ShowCursor(TRUE);
+#else
+				ShowCursor(FALSE);
+#endif
+			}
+			break;
+		}
 	}
 
 	void InputController::onKeyUp(WPARAM wParam)
 	{
-		if(wParam == 0x57 || wParam == 0x41 || wParam == 0x53 || wParam == 0x44)
+		if(wParam == 0x57 || wParam == 0x41 || wParam == 0x53 || wParam == 0x44 || wParam == VK_UP || wParam == VK_DOWN)
 		{
 			this->motionState = MOTION_STATE_STATIONARY;
 		}

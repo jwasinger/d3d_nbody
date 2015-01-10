@@ -46,7 +46,6 @@ std::vector<std::string> split_no_remove(const std::string &str, char delim)
 	return elems;
 }
 
-
 std::vector<std::wstring> split(const std::wstring &str, wchar_t delim)
 {
 	std::vector<std::wstring> elems;

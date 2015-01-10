@@ -70,6 +70,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="DirectXTK\DirectXTK_Desktop_2012.vcxproj.filters" />
+    <None Include="shaders\texture_common.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Camera3D.h" />
@@ -80,9 +81,11 @@
     <ClInclude Include="inc\Error.h" />
     <ClInclude Include="inc\InputController.h" />
     <ClInclude Include="inc\log.h" />
+    <ClInclude Include="inc\media.h" />
     <ClInclude Include="inc\misc.h" />
     <ClInclude Include="inc\MyMath.h" />
     <ClInclude Include="inc\NBodySim.h" />
+    <ClInclude Include="inc\ProcSphere.h" />
     <ClInclude Include="inc\Renderer.h" />
     <ClInclude Include="inc\TextConsole.h" />
     <ClInclude Include="inc\Timer.h" />
@@ -96,11 +99,33 @@
     <ClCompile Include="src\InputController.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\media.cpp" />
     <ClCompile Include="src\misc.cpp" />
     <ClCompile Include="src\NBodySim.cpp" />
+    <ClCompile Include="src\ProcSphere.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\TextConsole.cpp" />
     <ClCompile Include="src\Timer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\Colored.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\compute.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\PointSprite.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\PSTexture.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\Texture.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\VSTexture.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
