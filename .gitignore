@@ -1,2 +1,5 @@
 DirectXTK/Bin
-vs2012/*
+bin/
+Thumbs.db
+ipch/
+d3d_nbody.sdf
