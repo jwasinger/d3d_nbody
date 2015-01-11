@@ -180,6 +180,16 @@ namespace NBody
 			this->debug_drawMatrix(this->Camera.GetView(), )*/
 		}
 		
+		//render position
+		std::wstring pos_text = L"Position (";
+		pos_text.append(std::to_wstring(this->renderer->GetCamera().GetPos().x));
+		pos_text.append(L", ");
+		pos_text.append(std::to_wstring(this->renderer->GetCamera().GetPos().y));
+		pos_text.append(L", ");
+		pos_text.append(std::to_wstring(this->renderer->GetCamera().GetPos().z));
+		pos_text.append(L")");
+		this->renderer->RenderText(pos_text, 0.0f, 0.1f);
+
 		this->renderer->EndText();
 
 		/*this->projMat = tmp;

@@ -198,17 +198,9 @@ namespace NBody
 		UINT offset[] = { 0 };
 
 		this->renderer->GetDeviceContext()->IASetVertexBuffers(0, 1, &this->vBuf, stride, offset);
-		
-		//set a new viewport
-		/*D3D11_VIEWPORT new_viewport, cur_viewport;
 
-		UINT num_viewports = 1;
-		this->renderer->GetDeviceContext()->RSGetViewports(&num_viewports, &cur_viewport);
-		new_viewport = cur_viewport;
-		new_viewport.MinDepth = 0.1f;
-		new_viewport.MaxDepth = 100.0f; */
-
-		this->renderer->SetTransform(TRANSFORM_WORLD, Matrix::CreateTranslation(Vector3(1.0f, 1.0f, -10.0f)));
+		//this->renderer->SetTransform(TRANSFORM_WORLD, Matrix::CreateTranslation(Vector3(1.0f, 1.0f, -10.0f)));
+		this->renderer->SetTransform(TRANSFORM_WORLD, Matrix::CreateTranslation(Vector3(0.0f, 0.0f, 0.0f)));
 		this->renderer->SetTransform(TRANSFORM_PROJECTION, Matrix::CreatePerspectiveFieldOfView(
 			3.14f/2.0f, 
 			this->renderer->GetBBWidth()/this->renderer->GetBBHeight(),

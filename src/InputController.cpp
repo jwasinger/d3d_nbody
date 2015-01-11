@@ -160,12 +160,6 @@ namespace NBody
 		this->renderer->GetCamera().RotateAxisAngle(view.Up(), mouseDamping*this->mouseDeltaX);
 	}
 
-	Vector3 InputController::__transform_local(Vector3 &v)
-	{
-		Matrix inv_view = this->renderer->GetInvTransform(TRANSFORM_VIEW);
-		return Vector3::TransformNormal(v, inv_view);
-	}
-
 	void InputController::Update(double ms)
 	{
 		float dist = (ms / 1000.0)*this->cameraMoveSpeed;
