@@ -38,6 +38,12 @@ namespace NBody
 		return this->view;
 	}
 
+	void Camera3D::Translate(Vector3 v)
+	{
+		this->translation += v;
+		this->val_changed = true;
+	}
+
 	Matrix Camera3D::GetInvView(void)
 	{
 		if (this->val_changed)

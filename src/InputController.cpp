@@ -118,15 +118,6 @@ namespace NBody
 				}
 				break;
 			}
-		case WM_MOUSEMOVE:
-			{
-				if(this->cameraMode == CAMERA_MODE_STATIC_CAMERA)
-				{
-					
-				}
-
-				break;
-			}
 		}
 	}
 
@@ -177,145 +168,65 @@ namespace NBody
 
 	void InputController::Update(double ms)
 	{
-		/*Matrix translation = Matrix::Identity();
-		float dist = (ms/1000.0)*this->cameraMoveSpeed;
-
-		switch(this->motionState)
-		{
-		case MOTION_STATE_FORWARD:
-			
-			//this->renderer->CameraTranslateInView(Vector3(0.0f, 0.0f, -dist));
-			break;
-		case MOTION_STATE_LEFT:
-
-			//this->renderer->CameraTranslateInView(Vector3(-dist, 0.0f, 0.0f));
-
-			break;
-		case MOTION_STATE_RIGHT:
-
-			//this->renderer->CameraTranslateInView(Vector3(dist, 0.0f, 0.0f));
-			break;
-		case MOTION_STATE_BACK:
-
-			//this->renderer->CameraTranslateInView(Vector3(0.0f, 0.0f, dist));
-			break;
-		}*/
-
 		float dist = (ms / 1000.0)*this->cameraMoveSpeed;
-		Matrix cur_transform = this->renderer->GetTransform(TRANSFORM_VIEW);
-		Matrix new_transform = Matrix::Identity();
-		Matrix inv_view = this->renderer->GetInvTransform(TRANSFORM_VIEW);
-		Matrix rot_x = Matrix::CreateRotationX(0.1f);
+		Matrix view = this->renderer->GetCamera().GetView();
 		Vector3 axis;
 
 		switch (this->motionState)
 		{
 		case MOTION_STATE_FORWARD:
-			new_transform = inv_view * Matrix::CreateTranslation(0.0f, 0.0f, dist);
-			cur_transform *= new_transform;
-			this->renderer->SetTransform(TRANSFORM_VIEW, 
-					cur_transform);
+			this->renderer->GetCamera().Translate(view.Forward() * dist);
 			break;
 		case MOTION_STATE_BACK:
-			new_transform = inv_view * Matrix::CreateTranslation(0.0f, 0.0f, -dist);
-			cur_transform *= new_transform;
-			this->renderer->SetTransform(TRANSFORM_VIEW,
-				cur_transform);
+			this->renderer->GetCamera().Translate(view.Backward() * dist);
 			break;
-		case MOTION_STATE_ROT_LEFT:
-			axis = __transform_local(Vector3(0, 0, 1));
-			new_transform = cur_transform * Matrix::CreateFromAxisAngle(axis, 0.1f);
-			this->renderer->SetTransform(TRANSFORM_VIEW,
-				new_transform);
+		case MOTION_STATE_LEFT:
+			this->renderer->GetCamera().Translate(view.Left() * dist);
+			break;
+		case MOTION_STATE_RIGHT:
+			this->renderer->GetCamera().Translate(view.Right() * dist);
 			break;
 		case MOTION_STATE_ROT_RIGHT:
-			axis = __transform_local(Vector3(0, 0, 1));
-			new_transform = cur_transform * Matrix::CreateFromAxisAngle(axis, -0.1f);
-			this->renderer->SetTransform(TRANSFORM_VIEW,
-				new_transform);
+			this->renderer->GetCamera().RotateAxisAngle(view.Forward(), 0.01f);
 			break;
-		case MOTION_STATE_ROT_DOWN:
-			axis = __transform_local(Vector3(1, 0, 0));
-			new_transform = cur_transform * Matrix::CreateFromAxisAngle(axis, 0.1f);
-			this->renderer->SetTransform(TRANSFORM_VIEW,
-				new_transform);
-			break;
-		case MOTION_STATE_ROT_UP:
-			axis = __transform_local(Vector3(1, 0, 0));
-			new_transform = cur_transform * Matrix::CreateFromAxisAngle(axis, -0.1f);
-			this->renderer->SetTransform(TRANSFORM_VIEW,
-				new_transform);
+		case MOTION_STATE_ROT_LEFT:
+			this->renderer->GetCamera().RotateAxisAngle(view.Forward(), -0.01f);
 			break;
 		}
 	}	
 
-	//Description of control scheme:
-	//'w','a','s','d' move forward, right, back, left respectively
-	//'q', toggle between camera modes
-	/*void InputController::onKeyDown(WPARAM wParam)
-	{
-		if(wParam == 0x51) // 'q' key
-		{
-			if(this->cameraMode == CAMERA_MODE_FPS_CAMERA)
-			{
-				this->cameraMode = CAMERA_MODE_STATIC_CAMERA;
-				ShowCursor(TRUE);
-			}
-			else if(this->cameraMode == CAMERA_MODE_STATIC_CAMERA)
-			{
-				this->cameraMode = CAMERA_MODE_FPS_CAMERA;
-				SetCursorPos(
-					this->windowRect.left + (int)(0.5f * (float)(this->windowWidth)),
-					this->windowRect.top + (int)(0.5f * (float)(this->windowHeight)));
-
-#ifdef _DEBUG
-				ShowCursor(TRUE);
-#else
-				ShowCursor(FALSE);
-#endif
-			}
-		}
-		else if(wParam == 0x57) // 'w' key
-		{
-			this->motionState = MOTION_STATE_FORWARD;
-		}
-		else if(wParam == 0x41) // 'a' key
-		{
-			this->motionState = MOTION_STATE_LEFT;
-		}
-		else if(wParam == 0x53) // 's' key
-		{
-			this->motionState = MOTION_STATE_BACK;
-		}
-		else if(wParam == 0x44)  // 'd' key
-		{
-			this->motionState = MOTION_STATE_RIGHT;
-		}
-	}*/
-
+	/*control scheme description:
+	* w- move forward
+	* a- move left
+	* s - move backwards
+	* d - move right
+	* q - rotate left over camera's z-axis
+	* e - rotate right over camera's z-axis
+	* , - enable/disable FPS mode
+	*/
 	void InputController::onKeyDown(WPARAM wParam)
 	{
 		switch (wParam)
 		{
-		case VK_UP:
+		case 0x57: // 'w' key
 			this->motionState = MOTION_STATE_FORWARD;
 			break;
-		case VK_DOWN:
+		case 0x41: // 'a' key
+			this->motionState = MOTION_STATE_LEFT;
+			break;
+		case 0x53: // 's' key
 			this->motionState = MOTION_STATE_BACK;
 			break;
-		case 0x57: // 'w' key
-			this->motionState = MOTION_STATE_ROT_DOWN;
+		case 0x44: // 'd' key
+			this->motionState = MOTION_STATE_RIGHT;
 			break;
-		case 0x41: // 'a' key
+		case 0x51: // 'q' key
 			this->motionState = MOTION_STATE_ROT_LEFT;
 			break;
-		case 0x53:
-			this->motionState = MOTION_STATE_ROT_UP;
-			break;
-		case 0x44: // 'd' key
+		case 0x45: // 'e' key
 			this->motionState = MOTION_STATE_ROT_RIGHT;
 			break;
-		case 0x51:
+		case VK_OEM_COMMA:
 			if (this->cameraMode == CAMERA_MODE_FPS_CAMERA)
 			{
 				this->cameraMode = CAMERA_MODE_STATIC_CAMERA;
@@ -340,7 +251,7 @@ namespace NBody
 
 	void InputController::onKeyUp(WPARAM wParam)
 	{
-		if(wParam == 0x57 || wParam == 0x41 || wParam == 0x53 || wParam == 0x44 || wParam == VK_UP || wParam == VK_DOWN)
+		if(wParam == 0x57 || wParam == 0x41 || wParam == 0x53 || wParam == 0x44 || wParam == 0x51 || wParam == 0x45)
 		{
 			this->motionState = MOTION_STATE_STATIONARY;
 		}

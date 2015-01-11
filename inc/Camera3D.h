@@ -27,6 +27,7 @@ namespace NBody
 		void RotateAxisAngle(Vector3 v, double angle);
 		void SetRotationAxisAngle(Vector3 v, double angle);
 		void SetPos(Vector3 v);
+		void Translate(Vector3 v);
 
 		Vector3 GetPos(void) const { return this->translation; }
 		Matrix GetView(void);
