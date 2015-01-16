@@ -156,8 +156,8 @@ namespace NBody
 		Vector3 mouseDelta(-this->mouseDeltaX, this->mouseDeltaY, 0.0f);
 		Matrix view = this->renderer->GetCamera().GetView();
 		
-		this->renderer->GetCamera().RotateAxisAngle(view.Right(), mouseDamping*this->mouseDeltaY);
-		this->renderer->GetCamera().RotateAxisAngle(view.Up(), mouseDamping*this->mouseDeltaX);
+		this->renderer->GetCamera().Yaw(-mouseDamping*this->mouseDeltaY);
+		this->renderer->GetCamera().Pitch(-mouseDamping*this->mouseDeltaX);
 	}
 
 	void InputController::Update(double ms)
@@ -169,22 +169,22 @@ namespace NBody
 		switch (this->motionState)
 		{
 		case MOTION_STATE_FORWARD:
-			this->renderer->GetCamera().Translate(view.Forward() * dist);
+			this->renderer->GetCamera().Walk(dist);
 			break;
 		case MOTION_STATE_BACK:
-			this->renderer->GetCamera().Translate(view.Backward() * dist);
+			this->renderer->GetCamera().Walk(-dist);
 			break;
 		case MOTION_STATE_LEFT:
-			this->renderer->GetCamera().Translate(view.Left() * dist);
+			this->renderer->GetCamera().Strafe(-dist);
 			break;
 		case MOTION_STATE_RIGHT:
-			this->renderer->GetCamera().Translate(view.Right() * dist);
+			this->renderer->GetCamera().Strafe(dist);
 			break;
 		case MOTION_STATE_ROT_RIGHT:
-			this->renderer->GetCamera().RotateAxisAngle(view.Forward(), 0.01f);
+			this->renderer->GetCamera().Roll(0.01f);
 			break;
 		case MOTION_STATE_ROT_LEFT:
-			this->renderer->GetCamera().RotateAxisAngle(view.Forward(), -0.01f);
+			this->renderer->GetCamera().Roll(-0.01f);
 			break;
 		}
 	}	

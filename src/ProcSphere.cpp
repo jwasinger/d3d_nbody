@@ -66,6 +66,12 @@ namespace NBody
 			/		\					/ 1\ /2 \
 			---------				   -----------
 			*/
+		if (permutations == 0)
+		{
+			__push_back_arr(output, verts, 3);
+			return;
+		}
+
 		std::vector<Vector4> output_0;
 		std::vector<Vector4> output_1;
 		std::vector<Vector4> output_2;
@@ -82,9 +88,8 @@ namespace NBody
 		__adjust_vert(v12);
 		__adjust_vert(v20);
 
-		if (permutations == 0)
+		if (permutations == 1)
 		{
-
 			Vector4 output_arr[] =
 			{
 				verts[0], v01, v20,
@@ -125,33 +130,48 @@ namespace NBody
 		std::vector<Vector4> output_all;
 		HRESULT res;
 
+		/*Vector4 vs[] =
+		{
+			Vector4(0, 1, 0, 1), // top
+			Vector4(1, -1, 1, 1), // lower right
+			Vector4(-1, -1, 1, 1), // lower left
+			Vector4(0, -1, -1, 1), //back
+		};*/
+		Vector4 vs[] =
+		{
+			Vector4(0, 1, 1.0f / sqrt(2.0f), 1), // top
+			Vector4(1, -1, 1.0f/sqrt(2.0f), 1), // lower right
+			Vector4(-1, -1, 1.0f/sqrt(2.0f), 1), // lower left
+			Vector4(0, -1, -1.0f/sqrt(2.0f), 1), //back
+		};
+
 		Vector4 tet[] =
 		{
 			//left
-			Vector4(0, 1, 0, 1),
-			Vector4(-1, -1, -1, 1),
-			Vector4(0, -1, 1, 1),
+			vs[0],
+			vs[2],
+			vs[3],
 
 			//bottom
-			Vector4(-1, -1, -1, 1),
-			Vector4(1, -1, -1, 1),
-			Vector4(0, -1, 1, 1),
+			vs[3],
+			vs[2],
+			vs[1],
 
 			//right
-			Vector4(1, -1, -1, 1),
-			Vector4(0, 1, 0, 1),
-			Vector4(1, -1, 1, 1),
+			vs[0], 
+			vs[3],
+			vs[1],
 
 			//front
-			Vector4(0, 1, 0, 1),
-			Vector4(1, -1, -1, 1),
-			Vector4(-1, -1, -1, 1),
+			vs[0],
+			vs[1],
+			vs[2],
 		};
 
 		this->__generate_faces(tet, output_left, permutations);
-		this->__generate_faces(tet, output_bottom, permutations);
-		this->__generate_faces(tet, output_right, permutations);
-		this->__generate_faces(tet, output_front, permutations);
+		this->__generate_faces(&(tet[3]), output_bottom, permutations);
+		this->__generate_faces(&(tet[6]), output_right, permutations);
+		this->__generate_faces(&(tet[9]), output_front, permutations);
 
 		//compile the vertices into one array 
 		__push_back_arr(output_all, output_left.data(), output_left.size());
@@ -199,12 +219,12 @@ namespace NBody
 
 		this->renderer->GetDeviceContext()->IASetVertexBuffers(0, 1, &this->vBuf, stride, offset);
 
-		//this->renderer->SetTransform(TRANSFORM_WORLD, Matrix::CreateTranslation(Vector3(1.0f, 1.0f, -10.0f)));
 		this->renderer->SetTransform(TRANSFORM_WORLD, Matrix::CreateTranslation(Vector3(0.0f, 0.0f, 0.0f)));
 		this->renderer->SetTransform(TRANSFORM_PROJECTION, Matrix::CreatePerspectiveFieldOfView(
 			3.14f/2.0f, 
 			this->renderer->GetBBWidth()/this->renderer->GetBBHeight(),
 			0.1f, 100.0f));
+		this->renderer->SetTransform(TRANSFORM_VIEW, this->renderer->GetCamera().GetView());
 		
 		//render as a wireframe mesh
 		ID3D11RasterizerState *new_rs = NULL;
@@ -220,8 +240,7 @@ namespace NBody
 		this->renderer->GetDeviceContext()->RSSetState(new_rs);
 
 		//do rendering 
-		this->renderer->SetColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-		this->renderer->GetDeviceContext()->Draw(this->num_tris, 0);
+		this->renderer->GetDeviceContext()->Draw(this->num_tris * 3, 0);
 
 		this->renderer->GetDeviceContext()->RSSetState(old_rs);
 	}

@@ -16,6 +16,7 @@ Renderer *renderer;
 InputController *inputController;
 DebugLayer *debugLayer;
 ProcSphere *p_sphere = NULL;
+ProcSphere *p_sphere2 = NULL;
 
 const int windowPosX = 300;
 const int windowPosY = 300;
@@ -108,7 +109,14 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (!p_sphere->Init(renderer))
 		return false;
 	
-	if (!p_sphere->Generate(0))
+	if (!p_sphere->Generate(5))
+		return false;
+	
+	p_sphere2 = new ProcSphere();
+	if (!p_sphere2->Init(renderer))
+		return false;
+
+	if (!p_sphere2->Generate(0))
 		return false;
 
 	init = true;
@@ -134,7 +142,11 @@ void Render(void)
 	//renderer->RenderDebugInfo();
 	debugLayer->Render();
 	
+	renderer->SetColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
 	p_sphere->Render();
+
+	/*renderer->SetColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	p_sphere2->Render();*/
 
 	//renderer->RenderParticles();
 

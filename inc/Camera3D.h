@@ -16,20 +16,35 @@ namespace NBody
 	private: 
 		Matrix view;
 		Matrix invView;
+		
 		Vector3 translation;
-		Matrix rotation;
+		Vector3 up;
+		Vector3 right;
+		Vector3 target;
+		
 		bool val_changed;
 
 	public:
 		Camera3D(void);
 		~Camera3D(void) {}
 		
-		void RotateAxisAngle(Vector3 v, double angle);
-		void SetRotationAxisAngle(Vector3 v, double angle);
+		/*void RotateAxisAngle(Vector3 v, double angle);
+		void SetRotationAxisAngle(Vector3 v, double angle);*/
 		void SetPos(Vector3 v);
+		Vector3 GetPos(void) const { return this->translation; }
+
 		void Translate(Vector3 v);
 
-		Vector3 GetPos(void) const { return this->translation; }
+		void Yaw(double angle);
+		void Pitch(double angle);
+		void Roll(double angle);
+		void RotateX(double angle);
+		void RotateY(double angle);
+		void RotateZ(double angle);
+		
+		void Strafe(float dist);
+		void Walk(float dist);
+
 		Matrix GetView(void);
 		Matrix GetInvView(void);
 
