@@ -93,6 +93,9 @@
     <ClInclude Include="inc\ProcSphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\a1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera3D.cpp">
@@ -135,6 +138,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ProcSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\a1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -162,6 +162,8 @@ namespace NBody
 		ID3D11RenderTargetView *const GetRTView(void) { return this->RTView; }
 		DirectX::SpriteBatch *const GetSpriteBatch(void) { return this->SBatch; }
 		DirectX::SpriteFont *const GetSpriteFont(void) {return this->SFont; }
+		ID3D11SamplerState *const GetSamplerState(void) { return this->defaultSampler; }
+
 	private:
 		//bool debug_init(void);
 		void debug_render(void);

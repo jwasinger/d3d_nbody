@@ -73,6 +73,7 @@
     <None Include="shaders\texture_common.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\a1.h" />
     <ClInclude Include="inc\Camera3D.h" />
     <ClInclude Include="inc\common_include.h" />
     <ClInclude Include="inc\Console.h" />
@@ -92,6 +93,7 @@
     <ClInclude Include="inc\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\a1.cpp" />
     <ClCompile Include="src\Camera3D.cpp" />
     <ClCompile Include="src\Console.cpp" />
     <ClCompile Include="src\DebugConsoleHost.cpp" />
