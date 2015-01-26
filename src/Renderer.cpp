@@ -116,7 +116,7 @@ namespace NBody
 		DXGI_SWAP_CHAIN_DESC swapChainDescription;
 		ZeroMemory(&swapChainDescription, sizeof(swapChainDescription));
 	
-		swapChainDescription.BufferCount = 1;
+		swapChainDescription.BufferCount = 2;
 		swapChainDescription.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		//swapChainDescription.Flags = 0;
 
@@ -243,6 +243,38 @@ namespace NBody
 		particleVBufferDesc.StructureByteStride = sizeof(unsigned int);
 		particleVBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
+		//create a state to disable depth stencil buffer
+		// Clear the second depth stencil state before setting the parameters.
+		D3D11_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
+
+		ZeroMemory(&depthDisabledStencilDesc, sizeof(depthDisabledStencilDesc));
+
+		// Now create a second depth stencil state which turns off the Z buffer for 2D rendering.  The only difference is 
+		// that DepthEnable is set to false, all other parameters are the same as the other depth stencil state.
+		depthDisabledStencilDesc.DepthEnable = false;
+		depthDisabledStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		depthDisabledStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		depthDisabledStencilDesc.StencilEnable = true;
+		depthDisabledStencilDesc.StencilReadMask = 0xFF;
+		depthDisabledStencilDesc.StencilWriteMask = 0xFF;
+		depthDisabledStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthDisabledStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+		depthDisabledStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthDisabledStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		depthDisabledStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthDisabledStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+		depthDisabledStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthDisabledStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		
+		// Create the state using the device.
+		result = this->device->CreateDepthStencilState(&depthDisabledStencilDesc, &this->depthStencilDisabled);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
+		this->context->OMGetDepthStencilState(&this->depthStencilEnabled, NULL);
+
 		if(FAILED(result = this->device->CreateBuffer(&particleVBufferDesc, NULL, &this->particleVBuffer)))
 			return false;
 
@@ -271,6 +303,14 @@ namespace NBody
 		}
 
 		return true;
+	}
+
+	void Renderer::SetDepthStencilEnabled(bool enable)
+	{
+		if (enable)
+			this->context->OMSetDepthStencilState(this->depthStencilEnabled, 0);
+		else
+			this->context->OMSetDepthStencilState(this->depthStencilDisabled, 0);
 	}
 
 	bool Renderer::createCBuffers(void)
@@ -389,7 +429,8 @@ namespace NBody
 	{
 		D3D11_SAMPLER_DESC samplerDesc;
 		ZeroMemory(&samplerDesc,sizeof(D3D11_SAMPLER_DESC));
-		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR; <-- use this to make texture blury instead of pixellated
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;

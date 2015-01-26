@@ -37,7 +37,7 @@ PS_INPUT VShader(VS_INPUT input)
 	output.Position = mul(world, input.Position);
 	output.Position = mul(view, output.Position);
 	output.Position = mul(projection, output.Position);
-
+	
 	return output;
 }
 

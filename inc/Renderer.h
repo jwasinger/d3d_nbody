@@ -108,6 +108,10 @@ namespace NBody
 		
 		ID3D11SamplerState *defaultSampler;
 
+		ID3D11DepthStencilState *depthStencilEnabled; 
+		ID3D11DepthStencilState *depthStencilDisabled;
+
+
 		//debug draw stuff----------------------------
 
 		//camera stuff
@@ -142,6 +146,7 @@ namespace NBody
 		
 		Camera3D &GetCamera(void) { return this->camera; }
 		void SetCullMode(D3D11_CULL_MODE mode);
+		void SetDepthStencilEnabled(bool enable);
 
 		void BeginText(void);
 		void RenderText(const std::wstring &txt, float screenPosX, float screenPosY);

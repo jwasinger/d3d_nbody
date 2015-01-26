@@ -3,8 +3,16 @@
 
 #include "Renderer.h"
 #include "log.h"
+#include "Vertex.h"
+#include <vector>
 
 using namespace NBody;
+
+struct A1_ColoredVertex
+{
+	XMINT2 Position;
+	Vector4 Color;
+};
 
 class A1
 {
@@ -15,17 +23,18 @@ public:
 	void Render(void);
 
 private:
-	
-	void batch_vertex(Vector2 v, Vector4 color);
-	void batch_pixel(XMINT2 position, short r, short b, short g);
+	void batch_vertex(A1_ColoredVertex vert);
+	void batch_pixel(XMINT2 position, char r, char b, char g);
 	void flush_verts(void); 
+	bool test_hit(XMINT2, A1_ColoredVertex v1, A1_ColoredVertex v2, A1_ColoredVertex v3);
 
 private:
 	ID3D11Texture2D *texture;
 	ID3D11ShaderResourceView *texture_SRV;
 	ID3D11Buffer *quad_v_buffer;
+	std::vector<A1_ColoredVertex> vertices;
 
-	short *raw_data;
+	char *raw_data;
 	int image_width, image_height;
 	Renderer *renderer;
 };

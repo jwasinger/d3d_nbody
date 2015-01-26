@@ -5,6 +5,7 @@
 #include "DebugLayer.h"
 #include "log.h"
 #include "ProcSphere.h"
+#include "A1.h"
 
 using namespace NBody;
 
@@ -15,8 +16,8 @@ NBodySim *simulation;
 Renderer *renderer;
 InputController *inputController;
 DebugLayer *debugLayer;
-ProcSphere *p_sphere = NULL;
-ProcSphere *p_sphere2 = NULL;
+
+A1 *a1 = NULL;
 
 const int windowPosX = 300;
 const int windowPosY = 300;
@@ -76,7 +77,8 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	simulation = new NBodySim();
 	renderer = new Renderer();
-	
+	a1 = new A1(renderer, 1000, 1000);
+
 	RECT windowRect;
 	GetWindowRect(hWnd, &windowRect);
 
@@ -85,6 +87,9 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return false;
 
 	if(!renderer->Init(windowRect, hWnd))
+		return false;
+
+	if (!a1->Init())
 		return false;
 
 	//renderer->HookDebug(options, &*inputController, &time);
@@ -105,7 +110,7 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return false;
 	}
 	
-	p_sphere = new ProcSphere();
+	/*p_sphere = new ProcSphere();
 	if (!p_sphere->Init(renderer))
 		return false;
 	
@@ -117,7 +122,7 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return false;
 
 	if (!p_sphere2->Generate(0))
-		return false;
+		return false;*/
 
 	init = true;
 	//ShellExecute(hWnd, "open", "DebugConsole.exe", NULL, NULL, 0);
@@ -142,8 +147,9 @@ void Render(void)
 	//renderer->RenderDebugInfo();
 	debugLayer->Render();
 	
-	renderer->SetColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-	p_sphere->Render();
+	/*renderer->SetColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));*/
+/*	p_sphere->Render();*/
+	a1->Render();
 
 	/*renderer->SetColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	p_sphere2->Render();*/
