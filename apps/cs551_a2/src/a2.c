@@ -1,6 +1,5 @@
 #include "a2.h"
 
-
 double cot(double val)
 {
     return 1.0 / (tan(val));
