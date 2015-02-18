@@ -10,9 +10,9 @@ namespace Core
 	class IRenderable
 	{
 	public:
-		virtual void Render(void);
-		virtual bool Init(void);
-		virtual void Release(void);
+		virtual void Render(void) = 0;
+		virtual bool Init(void) = 0;
+		virtual void Release(void) = 0;
 	};
 
 	class Scene
@@ -21,10 +21,13 @@ namespace Core
 		Scene();
 		~Scene();
 		
-		virtual void Render(void);
+		virtual void Render(void) = 0;
 
 		void DrawScene(void);
-		bool Init(void);
+		bool Init(RECT window_rect, HWND window_hwnd);
+    
+    Renderer *const GetRenderer(void) { return this->renderer; }
+    Camera *const GetCamera(void) { return &(this->camera); }
 
 	private:
 		void begin_draw(void);

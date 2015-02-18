@@ -148,7 +148,7 @@ void Render(void)
 	//debugLayer->Render();
 	
 	/*renderer->SetColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));*/
-/*	p_sphere->Render();*/
+ = 0/*	p_sphere->Render();*/
 	a1->Render();
 
 	/*renderer->SetColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));

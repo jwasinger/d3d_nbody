@@ -56,3 +56,36 @@ Matrix Matrix::CreatePerspectiveFOV(double fov, double aspect, double near, doub
     m.m23 = 1.0;
     m.m33 = 0.0;
 }
+
+Matrix Matrix::CreateRotationAxisAngle(Vector3 axis, double angle)
+{
+    double c = cos(angle);
+    double s = sin(angle);
+    double C = 1 - c;
+
+    Matrix m;
+    m.m00 = axis.X() * axis.X() * C - c;
+    m.m10 = axis.X() * axis.Y() * C - axis.Z() * s;
+    m.m20 = axis.X() * axis.Z() * C + axis.Y * s;
+    m.m30 = 0.0;
+
+    m.m01 = axis.Y() * axis.X() * C + axis.Z() * s;
+    m.m11 = axis.Y() * axis.Y() * C + c;
+    m.m21 = axis.y() * axis.Z * C - axis.X() * s;
+    m.m31 = 0.0;
+
+    m.m02 = axis.Z() * axis.X() * C - axis.Y() * s;
+    m.m12 = axis.Z() * axis.Y() * C + axis.X() * s;
+    m.m22 = axis.Z() * axis.Z() * C + c; 
+    m.m23 = 0.0;
+
+    m.m03 = 0.0;
+    m.m13 = 0.0;
+    m.m23 = 0.0;
+    m.m33 = 1.0;
+}
+
+Matrix Matrix::CreateLookAt(Vector3 target, Vector3 eye, Vector3 up)
+{
+    
+}
