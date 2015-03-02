@@ -31,7 +31,8 @@ struct Ray
 
 struct CollisionInfo
 {
-	float4 col; //x,y,z normal, w- collided (1.0) or not (0.0)
+	Ray outgoing;
+	bool collided;
 };
 
 cbuffer ray_tracer_params : register(b0)
@@ -61,7 +62,34 @@ float2 get_ndc_coords(uint2 tid)
 CollisionInfo ray_sphere_collision(Ray ray)
 {
 	CollisionInfo out =  (CollisionInfo)0;
-	
+	out.collided = false;
+
+	float determinant = pow(dot(ray.dir, ray.pos - ((float3)sphere)), 2) - 
+						pow(length(ray.pos - (float3)sphere), 2) + 
+						pow(sphere.w, 2);
+
+	if(determinant > 0.0f)
+	{
+		out.collided = true;
+		/*
+		//calculate where collision occured and return an outgoing ray direction
+		float d_near = -dot(ray.dir, ray.pos - (float3)sphere) + sqrt(determinant);
+		float d_far = -dot(ray.dir, ray.pos - (float3)sphere) - sqrt(determinant);
+
+		if(abs(ray.pos - d_near) < abs(ray.pos - d_far)
+		{
+			if(ray.pos )
+			out.outgoing.pos = ray.pos + d_near;
+			out.outgoing.
+		}
+		else
+		{
+
+		}
+		*/
+	}
+
+	return collided
 }
 
 [numthreads(16, 16, 1)]
@@ -82,7 +110,7 @@ void ray_trace_main(uint2 tid : SV_DispatchThreadID)
 
 		//advance the ray forward 'step_dist'
 		ci = ray_sphere_collision(ray);
-		if (ci.col.w == 1.0f)
+		if (ci.collided)
 		{
 			color = sphere_material;
 			color.w = 1.0f;
