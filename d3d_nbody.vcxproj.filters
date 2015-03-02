@@ -19,12 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DirectXTK\DirectXTK_Desktop_2012.vcxproj.filters" />
-    <None Include="shaders\texture_common.hlsli">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\VSTexture.hlsl">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shaders\Colored.hlsl">
       <Filter>shaders</Filter>
     </None>
@@ -34,10 +28,10 @@
     <None Include="shaders\PointSprite.hlsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\PSTexture.hlsl">
+    <None Include="shaders\Texture.hlsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\Texture.hlsl">
+    <None Include="shaders\ray_trace_compute.hlsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
@@ -55,9 +49,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\DebugLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\InputController.h">
@@ -102,15 +93,12 @@
     <ClInclude Include="inc\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\RayTracer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Console.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DebugConsoleHost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DebugLayer.cpp">
@@ -143,9 +131,6 @@
     <ClCompile Include="src\ProcSphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\a1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -153,6 +138,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RayTracer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

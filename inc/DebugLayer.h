@@ -4,7 +4,6 @@
 #include<memory>
 
 #include "InputController.h"
-#include "Console.h"
 #include "Renderer.h"
 #include "MyMath.h"
 #include "log.h"
@@ -41,7 +40,6 @@ namespace Core
 		void OnMouseKeyInput(WPARAM wparam, LPARAM lparam);
 
 	private:
-		Console* console;
 		Renderer* renderer;
 		const Timer* timer;
 		const InputController *inputController;

@@ -5,19 +5,17 @@
 #include "DebugLayer.h"
 #include "log.h"
 #include "ProcSphere.h"
-#include "A1.h"
+#include "RayTracer.h"
 
 using namespace Core;
 
 HWND hWnd;
 Timer time;
 
-NBodySim *simulation;
 Renderer *renderer;
 InputController *inputController;
 DebugLayer *debugLayer;
-
-A1 *a1 = NULL;
+RayTracer *ray_tracer;
 
 const int windowPosX = 300;
 const int windowPosY = 300;
@@ -75,10 +73,8 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// display the window on the screen
 	ShowWindow(hWnd, SW_MAXIMIZE);
 
-	simulation = new NBodySim();
 	renderer = new Renderer();
-	a1 = new A1(renderer, 256, 256);
-
+	
 	RECT windowRect;
 	GetWindowRect(hWnd, &windowRect);
 
@@ -89,13 +85,11 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if(!renderer->Init(windowRect, hWnd))
 		return false;
 
-	if (!a1->Init())
+	ray_tracer = new RayTracer(renderer);
+	if (!ray_tracer->Init())
 		return false;
-
-	//renderer->HookDebug(options, &*inputController, &time);
-
-	if(!simulation->Init(renderer->GetDeviceContext(), renderer->GetDevice(), 10))
-		return false;
+	
+	ray_tracer->Run();
 
 	DebugOptions options;
 	options.RenderAxes = true;
@@ -109,34 +103,14 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		freeAppResources();
 		return false;
 	}
-	
-	/*p_sphere = new ProcSphere();
-	if (!p_sphere->Init(renderer))
-		return false;
-	
-	if (!p_sphere->Generate(5))
-		return false;
-	
-	p_sphere2 = new ProcSphere();
-	if (!p_sphere2->Init(renderer))
-		return false;
-
-	if (!p_sphere2->Generate(0))
-		return false;*/
 
 	init = true;
 	//ShellExecute(hWnd, "open", "DebugConsole.exe", NULL, NULL, 0);
 	return true;
 }
 
-void createSimulationResources(void)
-{
-		
-}
-
 void Update(double elapsed)
 {
-	simulation->Tick(elapsed);
 	inputController->Update(elapsed);
 }
 
@@ -144,17 +118,7 @@ void Render(void)
 {
 	renderer->BeginRender();
 
-	//renderer->RenderDebugInfo();
-	//debugLayer->Render();
-	
-	/*renderer->SetColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));*/
- = 0/*	p_sphere->Render();*/
-	a1->Render();
-
-	/*renderer->SetColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-	p_sphere2->Render();*/
-
-	//renderer->RenderParticles();
+	ray_tracer->Render();
 
 	renderer->EndRender();
 }
@@ -198,7 +162,6 @@ void freeAppResources(void)
 	SafeDelete(&debugLayer);
 	SafeDelete(&inputController);
 	SafeDelete(&renderer);
-	SafeDelete(&simulation);
 	close_log();
 	return;
 }

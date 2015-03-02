@@ -2,7 +2,6 @@
 #define CAMERA_3D_H
 
 #include "Math.h"
-#include "Error.h"
 #include "common_include.h"
 
 #include <SimpleMath.h>

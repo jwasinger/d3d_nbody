@@ -51,12 +51,14 @@ namespace Core
 		LPBYTE lpb = new BYTE[dwSize];
 		if (lpb == NULL) 
 		{
-			throw RuntimeError();
+			log_str("lb is NULL\n");
+			exit(-1);
 		} 	
 
 		if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER)) != dwSize )
 		{
-			throw RuntimeError("GetRawInputData does not return correct size !");
+			log_str("GetRawInputData returned unexpected size.\n");
+			exit(-1);
 		}
 		
 		RAWINPUT *raw = (RAWINPUT *)lpb;

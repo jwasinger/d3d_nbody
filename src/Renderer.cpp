@@ -18,19 +18,9 @@ namespace Core
 		this->particleTextureSRV = nullptr;
 		this->PSInputLayout = nullptr;
 		this->textureInputLayout = nullptr;
-		this->quadVBuffer = nullptr;
-		this->particleVBuffer = nullptr;
-		this->particleBuffer0 = nullptr;
-		this->particleBuffer1 = nullptr;
-		this->particleSRV0 = nullptr;
-		this->particleSRV1 = nullptr;
-		this->pDrawParamsBuffer = nullptr;
 		this->textureVShader = nullptr;
 		this->texturePShader = nullptr;
 		this->boundShader = SHADER_TYPE_NONE;
-		this->PSVShader = nullptr;
-		this->PSPShader = nullptr;
-		this->PSGShader = nullptr;
 		this->colorVShader = nullptr;
 		this->colorPShader = nullptr;
 		this->colorInputLayout = nullptr;
@@ -55,20 +45,10 @@ namespace Core
 		RTView->Release();
 		delete SBatch;
 		delete SFont;
-		particleTexture->Release();
-		particleTextureSRV->Release();
-		PSInputLayout->Release();
 		textureInputLayout->Release();
-		quadVBuffer->Release();
-		particleVBuffer->Release();
-		pDrawParamsBuffer->Release();
 
 		textureVShader->Release();
 		texturePShader->Release();
-		
-		PSVShader->Release();
-		PSPShader->Release();
-		PSGShader->Release();
 
 		colorVShader->Release();
 		colorPShader->Release();
@@ -212,37 +192,6 @@ namespace Core
 		viewport.TopLeftY = 0.0f;
 		this->context->RSSetViewports(1, &viewport);
 
-		//load the texture for the particle point sprite
-		if(FAILED(result = DirectX::CreateWICTextureFromFile(this->device, this->context, GetMediaPath(L"particle.bmp").data(), &this->particleTexture, &this->particleTextureSRV)))
-		{
-			OutputDebugString("\nCreateWICTextureFromFile() failed\n");
-			return false;
-		}
-
-		//create vBuffer to hold quad verts
-		D3D11_BUFFER_DESC quadBufferDesc;
-		ZeroMemory(&quadBufferDesc, sizeof(D3D11_BUFFER_DESC));
-		quadBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		quadBufferDesc.ByteWidth = sizeof(NBody::TexturedVertex) * 6;
-		quadBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		quadBufferDesc.MiscFlags = 0;
-		quadBufferDesc.StructureByteStride = sizeof(NBody::TexturedVertex);
-		quadBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-
-		if(FAILED(result = this->device->CreateBuffer(&quadBufferDesc, nullptr, &this->quadVBuffer)))
-			return false;
-
-		this->numParticles = 10;
-		//create a vertex buffer for the particle point sprites
-		D3D11_BUFFER_DESC particleVBufferDesc;
-		ZeroMemory(&particleVBufferDesc, sizeof(D3D11_BUFFER_DESC));
-		particleVBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		particleVBufferDesc.ByteWidth = sizeof(unsigned int) * numParticles;
-		particleVBufferDesc.CPUAccessFlags = 0;
-		particleVBufferDesc.MiscFlags = 0;
-		particleVBufferDesc.StructureByteStride = sizeof(unsigned int);
-		particleVBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
 		//create a state to disable depth stencil buffer
 		// Clear the second depth stencil state before setting the parameters.
 		D3D11_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
@@ -274,9 +223,6 @@ namespace Core
 		}
 
 		this->context->OMGetDepthStencilState(&this->depthStencilEnabled, NULL);
-
-		if(FAILED(result = this->device->CreateBuffer(&particleVBufferDesc, NULL, &this->particleVBuffer)))
-			return false;
 
 		if(!this->createRasterizerStates())
 			return false;
@@ -352,12 +298,6 @@ namespace Core
 
 		ID3D11Buffer *cBuffers[3] = { this->worldCBuffer, this->projectionCBuffer, this->viewCBuffer };
 		this->context->VSSetConstantBuffers(0, 3, cBuffers);
-		
-		bufferDesc.ByteWidth = sizeof(ParticleDrawParams);
-		bufferDesc.StructureByteStride = 0;
-
-		if(FAILED(this->device->CreateBuffer(&bufferDesc, NULL, &this->pDrawParamsBuffer)))
-			return false;
 		
 		bufferDesc.ByteWidth = sizeof(XMFLOAT4);
 		bufferDesc.StructureByteStride = 0;
@@ -486,62 +426,7 @@ namespace Core
 		ID3DBlob *gShaderCode = nullptr;
 		ID3DBlob *errorCode = nullptr;
 
-		//create Point Sprite shaders ----------------------------------------------------------------------------------------------------
 		HRESULT res;
-
-		if(FAILED(res = D3DCompileFromFile(GetShaderPath(L"PointSprite.hlsl").data(), nullptr, nullptr, "VShader", "vs_5_0", flags1, 0, &vShaderCode, &errorCode)))
-		{
-			SafeRelease<ID3DBlob>(&vShaderCode);	
-			if(errorCode)
-			{
-				OutputDebugStringA((LPCSTR)errorCode->GetBufferPointer());
-				SafeRelease<ID3DBlob>(&errorCode);
-			}
-
-			return false;
-		}
-		
-		if(FAILED(res = D3DCompileFromFile(GetShaderPath(L"PointSprite.hlsl").data(), nullptr, nullptr, "PShader", "ps_5_0", flags1, 0, &pShaderCode, &errorCode)))
-		{
-			SafeRelease<ID3DBlob>(&pShaderCode);	
-			if(errorCode)
-			{
-				OutputDebugStringA((LPCSTR)errorCode->GetBufferPointer());
-				SafeRelease<ID3DBlob>(&errorCode);
-			}
-
-			return false;
-		}
-
-		if(FAILED(res = D3DCompileFromFile(GetShaderPath(L"PointSprite.hlsl").data(), nullptr, nullptr, "GShader", "gs_5_0", flags1, 0, &gShaderCode, &errorCode)))
-		{
-			SafeRelease<ID3DBlob>(&pShaderCode);	
-			if(errorCode)
-			{
-				OutputDebugStringA((LPCSTR)errorCode->GetBufferPointer());
-				SafeRelease<ID3DBlob>(&errorCode);
-			}
-
-			return false;
-		}
-
-		if(FAILED(this->device->CreateGeometryShader(gShaderCode->GetBufferPointer(), gShaderCode->GetBufferSize(), nullptr, &this->PSGShader)))
-		{
-			OutputDebugString("\ncreate point sprite geometry shader failed\n");
-			return false;	
-		}
-
-		if(FAILED(this->device->CreatePixelShader(pShaderCode->GetBufferPointer(), pShaderCode->GetBufferSize(), nullptr, &this->PSPShader)))
-		{
-			OutputDebugString("\ncreate point sprite pixel shader failed\n");
-			return false;
-		}
-
-		if(FAILED(this->device->CreateVertexShader(vShaderCode->GetBufferPointer(), vShaderCode->GetBufferSize(), nullptr, &this->PSVShader)))
-		{
-			OutputDebugString("\n create point sprite vertex shader failed\n");
-			return false;
-		}
 
 		D3D11_INPUT_ELEMENT_DESC positionInputElement;
 		positionInputElement.AlignedByteOffset = 0;
@@ -551,15 +436,6 @@ namespace Core
 		positionInputElement.InstanceDataStepRate = 0;
 		positionInputElement.SemanticName = "POSITION";
 		positionInputElement.SemanticIndex = 0;
-
-		if(FAILED(this->device->CreateInputLayout(&positionInputElement, 1, vShaderCode->GetBufferPointer(), vShaderCode->GetBufferSize(), &this->PSInputLayout)))
-		{
-			OutputDebugString("\nCreate positionInputElement failed\n");
-			return false;
-		}
-
-		SafeRelease<ID3DBlob>(&vShaderCode);
-		SafeRelease<ID3DBlob>(&pShaderCode);
 
 		//create Texture shaders------------------------------------------------------------------------------------------------------------
 		
@@ -657,16 +533,6 @@ namespace Core
 			return false;
 		}
 
-		/*D3D11_INPUT_ELEMENT_DESC colorInputElement;
-		ZeroMemory(&colorInputElement, sizeof(D3D11_INPUT_ELEMENT_DESC));
-		colorInputElement.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-		colorInputElement.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		colorInputElement.InputSlot = 0;
-		colorInputElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		colorInputElement.InstanceDataStepRate = 0;
-		colorInputElement.SemanticIndex = 0;
-		colorInputElement.SemanticName = "COLOR";*/
-
 		D3D11_INPUT_ELEMENT_DESC colorIEArr[1] = {positionInputElement};
 		if(FAILED(this->device->CreateInputLayout(colorIEArr, 1, vShaderCode->GetBufferPointer(), vShaderCode->GetBufferSize(), &this->colorInputLayout)))
 		{
@@ -674,22 +540,12 @@ namespace Core
 			return false;
 		}
 
+		SafeRelease<ID3DBlob>(&vShaderCode);
+		SafeRelease<ID3DBlob>(&pShaderCode);
+
 		return true;
 	}
 	
-	bool Renderer::isGShaderBound(void)
-	{
-		ID3D11GeometryShader* gShader = NULL;
-		this->context->GSGetShader(&gShader, NULL, NULL);
-
-		if(!gShader)
-		{
-			return false;
-		}
-
-		return true;
-	}
-
 	void Renderer::SetTransform(TRANSFORM_TYPE type, const Matrix &val)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
@@ -767,22 +623,6 @@ namespace Core
 		OutputDebugString("\nInvalid parameters to Renderer::GetTransform()\n");
 	}
 
-	void Renderer::rebindParticleCBs(void)
-	{
-		ParticleDrawParams params;
-		params.radius = 1.0f;
-		
-		//does & operator on function call produce weird results?
-		XMStoreFloat4x4(&params.invView, this->invViewMat);
-
-		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-		this->context->Map(this->pDrawParamsBuffer, 0, D3D11_MAP_WRITE, 0, &mappedSubresource);
-		mappedSubresource.pData = &params;
-
-		ID3D11Buffer *cBufferArr[1] = {this->pDrawParamsBuffer};
-		this->context->GSSetConstantBuffers(3, 1, cBufferArr);
-	}
-
 	void Renderer::rebindTransformCBs(void)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
@@ -833,56 +673,6 @@ namespace Core
 		this->context->GSSetConstantBuffers(2, 1, cBuffer);
 	}
 
-	//todo, see if srvs are ubound from pipeline when teh shader is switched
-	void Renderer::drawParticles(void)
-	{
-		ID3D11ShaderResourceView *particleTextureSRVArr = {this->particleTextureSRV};
-		ID3D11ShaderResourceView *nullSRVArr = { NULL };
-		ID3D11SamplerState *samplerArr = {this->defaultSampler};
-		ID3D11SamplerState *nullSamplerArr = {NULL};
-		ID3D11ShaderResourceView *particleBufferSRVArr = {this->particleSRV0};
-
-		/*this->Context->PSSetShader(this->PSPShader, NULL, 0);
-		this->Context->VSSetShader(this->PSVShader, NULL, 0);
-		this->Context->GSSetShader(this->PSGShader, NULL, 0);*/
-
-		this->BindShader(SHADER_TYPE_POINT_SPRITE);
-
-		/*XMMATRIX mat = XMMatrixIdentity();
-		XMFLOAT4X4 identity;
-		XMStoreFloat4x4(&identity, mat);*/
-		//this->SetTransform(TRANSFORM_WORLD, Matrix::Identity());
-		
-		this->rebindParticleCBs();
-		//this->rebindTransformCBs();
-
-		this->context->PSSetShaderResources(0, 1, &particleTextureSRVArr);
-		this->context->PSSetSamplers(1, 1, &samplerArr);
-		this->context->GSGetShaderResources(2, 1, &particleBufferSRVArr);
-
-		ID3D11Buffer *vBufferArr = {this->particleVBuffer};
-		UINT stride[] = { sizeof(UINT) };
-		UINT offset[] = { 0 };
-		this->context->IASetVertexBuffers(0, 1, &vBufferArr, stride, offset);
-
-		this->context->IASetInputLayout(this->PSInputLayout);
-		this->context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-
-		this->context->Draw(numParticles, 0);
-		
-		//this->Context->IASetVertexBuffers(0, 1, &nullVBufferArr, NULL, NULL);
-
-		this->context->IASetInputLayout(NULL);
-
-		this->context->PSSetShaderResources(0,1, &nullSRVArr);
-		
-		/*this->Context->PSSetShader(NULL, NULL, 0);
-		this->Context->VSSetShader(NULL, NULL, 0);
-		this->Context->GSSetShader(NULL, NULL, 0);*/
-		
-		this->UnbindShader();
-	}
-	
 	void Renderer::BindShader(SHADER_TYPE type)
 	{
 		/*if(type == this->boundShader)
@@ -898,14 +688,6 @@ namespace Core
 			this->context->GSSetShader(nullptr, nullptr, 0);
 
 			this->context->IASetInputLayout(this->colorInputLayout);
-			break;
-
-		case SHADER_TYPE_POINT_SPRITE:
-			this->context->PSSetShader(this->PSPShader, nullptr, 0);
-			this->context->VSSetShader(this->PSVShader, nullptr, 0);
-			this->context->GSSetShader(this->PSGShader, nullptr, 0);
-
-			this->context->IASetInputLayout(this->PSInputLayout);
 			break;
 
 		case SHADER_TYPE_TEXTURE:

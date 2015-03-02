@@ -4,8 +4,8 @@
 #include "common_include.h"
 #include<Windows.h>
 #include<windowsx.h>
-#include "Error.h"
 #include "Renderer.h"
+#include "log.h"
 #include <sstream>
 
 namespace Core
