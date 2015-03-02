@@ -6,14 +6,12 @@ namespace Core
 	DebugLayer::DebugLayer()
 	{
 		this->axesVBuffer = nullptr;
-		this->console = nullptr;
 		this->renderer = nullptr;
 		this->timer = nullptr;
 	}
 
 	DebugLayer::~DebugLayer()
 	{
-		delete this->console;
 		this->axesVBuffer->Release();
 	}
 
@@ -212,7 +210,7 @@ namespace Core
 			this->renderer->SetTransform(TRANSFORM_TYPE::TRANSFORM_WORLD, transform);
 			
 			//projecting in wrong direction in z axis for some reason
-			Matrix proj = NBody::CreateOrthographicOffCenterLH(0.0f, 1.0f, 0.0f, 1.0f, 0.1f, 1.0f);
+			Matrix proj = CreateOrthographicOffCenterLH(0.0f, 1.0f, 0.0f, 1.0f, 0.1f, 1.0f);
 			/*Matrix proj = NBody::CreateOrthographicLH(
 				2,//this->renderer->GetBBWidth(), 
 				2,//this->renderer->GetBBHeight(),

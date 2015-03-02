@@ -14,9 +14,6 @@ namespace Core
 		this->RTView = nullptr;
 		this->SBatch = nullptr;
 		this->SFont = nullptr;
-		this->particleTexture = nullptr;
-		this->particleTextureSRV = nullptr;
-		this->PSInputLayout = nullptr;
 		this->textureInputLayout = nullptr;
 		this->textureVShader = nullptr;
 		this->texturePShader = nullptr;
@@ -64,6 +61,16 @@ namespace Core
 		rsDefault->Release();
 
 		defaultSampler->Release();
+	}
+
+	void Renderer::BindSampler(bool bind)
+	{
+		ID3D11SamplerState *nullSampler = nullptr;
+
+		if (bind)
+			this->context->PSSetSamplers(0, 1, &this->defaultSampler);
+		else
+			this->context->PSSetSamplers(0, 1, &nullSampler);
 	}
 
 	bool Renderer::Init(const RECT &windowRect, HWND hWnd)

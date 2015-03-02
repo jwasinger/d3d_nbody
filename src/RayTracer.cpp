@@ -13,11 +13,11 @@ namespace Core
 
 		D3D11_TEXTURE2D_DESC compute_output_desc;
 		compute_output_desc.ArraySize = 1;
-		compute_output_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		compute_output_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 		compute_output_desc.CPUAccessFlags = 0;
 		compute_output_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		compute_output_desc.Width = 360;
-		compute_output_desc.Height = 360;
+		compute_output_desc.Width = CS_OUTPUT_WIDTH;
+		compute_output_desc.Height = CS_OUTPUT_HEIGHT;
 		compute_output_desc.MipLevels = 1;
 		compute_output_desc.MiscFlags = 0;
 		compute_output_desc.SampleDesc.Count = 1;
@@ -175,6 +175,8 @@ namespace Core
 			OutputDebugString("\n create colored pixel shader failed \n");
 			return false;
 		}
+
+		return true;
 	}
 
 	void RayTracer::Run()
@@ -183,10 +185,11 @@ namespace Core
 		
 		ID3D11UnorderedAccessView *uavNull[1] = {nullptr};
 		
+		this->renderer->GetDeviceContext()->CSSetShader(this->ray_tracer_shader, nullptr, 0);
 		this->renderer->GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, &this->output_uav, nullptr);
 		this->renderer->GetDeviceContext()->CSSetConstantBuffers(0, 1, &this->params_c_buffer);
 		
-		this->renderer->GetDeviceContext()->Dispatch(45, 45, 1);
+		this->renderer->GetDeviceContext()->Dispatch(32, 32, 1);
 
 		this->renderer->GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, uavNull, nullptr);
 	}
@@ -195,6 +198,11 @@ namespace Core
 	{
 		this->renderer->BindShader(SHADER_TYPE_TEXTURE);
 		this->renderer->GetDeviceContext()->PSSetShaderResources(0, 1, &this->compute_output_view);
+		
+		ID3D11ShaderResourceView *nullSRV[1] = { nullptr };
+
+		this->renderer->BindSampler(true);
+
 
 		UINT strides[1] = { sizeof(TexturedVertex) };
 		UINT offsets[1] = { 0 };
@@ -205,7 +213,10 @@ namespace Core
 
 		this->renderer->GetDeviceContext()->Draw(6, 0);
 
-		this->renderer->GetDeviceContext()->IASetVertexBuffers(0, 1, &null_v_buff, strides, offsets);
+		this->renderer->BindSampler(false);
+
+		this->renderer->GetDeviceContext()->PSSetShaderResources(0, 1, nullSRV);
+		this->renderer->GetDeviceContext()->IASetVertexBuffers(0, 1, null_v_buff, strides, offsets);
 		this->renderer->BindShader(SHADER_TYPE_NONE);
 	}
 }

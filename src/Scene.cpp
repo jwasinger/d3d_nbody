@@ -2,10 +2,10 @@
 
 namespace Core
 {
-    void Scene::Scene()
+    Scene::Scene()
     {
         this->renderer = new Renderer();
-        this->objects = std::vector(10);
+        this->objects = std::vector<IRenderable>(10);
     }
     
     Scene::~Scene()

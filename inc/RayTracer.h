@@ -5,6 +5,9 @@
 #include "Vertex.h"
 #include "log.h"
 
+#define CS_OUTPUT_WIDTH 512
+#define CS_OUTPUT_HEIGHT 512
+
 namespace Core
 {
 	struct RayTracerParams

@@ -118,6 +118,8 @@ void Render(void)
 {
 	renderer->BeginRender();
 
+	ray_tracer->Run();
+
 	ray_tracer->Render();
 
 	renderer->EndRender();

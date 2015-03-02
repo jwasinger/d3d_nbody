@@ -3,7 +3,7 @@
 
 namespace Core
 {
-	NBody::Timer::Timer(void)
+	Timer::Timer(void)
 	{
 		ZeroMemory(&this->time, sizeof(LARGE_INTEGER));
 

@@ -60,7 +60,6 @@ namespace Core
 
 		ID3D11InputLayout *textureInputLayout;
 
-
 		ID3D11VertexShader *textureVShader;
 		ID3D11PixelShader *texturePShader;
 
@@ -108,6 +107,9 @@ namespace Core
 
 		void BindShader(SHADER_TYPE type);
 		void UnbindShader(void);
+
+		//bind the default texture sampler to the pipeline at slot 0
+		void BindSampler(bool bind);
 
 		int GetBBWidth(void) const  { return this->bbWidth; }
 		int GetBBHeight(void) const { return this->bbHeight; }
