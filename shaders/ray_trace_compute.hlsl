@@ -8,16 +8,6 @@
 #define MAX_LIGHTS 16
 #define MAX_PLANES 16
 
-struct Material;
-struct Triangle;
-struct Plane;
-struct Sphere;
-
-RWTexture2D<float4> tex;
-StructuredBuffer<Material> materials;
-StructuredBuffer<Sphere> spheres;
-StructuredBuffer<Planes> planes;
-
 struct Material
 {
 	float3 ambient_color;
@@ -53,6 +43,7 @@ struct Sphere
 	int material_index;
 };
 
+
 struct Ray
 {
 	float3 pos;
@@ -67,15 +58,22 @@ struct CollisionInfo
 	bool collided;
 };
 
+RWTexture2D<float4> tex;
+StructuredBuffer<Material> materials;
+StructuredBuffer<Sphere> spheres;
+StructuredBuffer<Plane> planes;
+
 cbuffer ray_tracer_params : register(b0)
 {
-	float4x4 view_transform;
-	
 	float epsilon;
 	float3 padding1;
-
 	float4 bgr_color;
-	Sphere spheres[MAX_SPHERES];
+	int num_spheres;
+	int3 padding2;
+	int num_materials;
+	int3 padding3;
+	int num_planes;
+	int3 padding4s
 };
 
 float2 get_ndc_coords(uint2 tid)
@@ -96,29 +94,31 @@ float3 reflect(float3 v, float3 n)
 	return normalize(r);
 }
 
-CollisionInfo ray_sphere_collision(Ray ray)
+CollisionInfo ray_sphere_collision(Ray ray, Sphere sphere)
 {
 	CollisionInfo col_info =  (CollisionInfo)0;
 	col_info.collided = false;
 	float4 step_dist = epsilon / ITERATIONS;
 
-	float determinant = pow(dot(ray.dir, ray.pos - ((float3)sphere)), 2) - 
-						pow(length(ray.pos - (float3)sphere), 2) + 
-						pow(sphere.w, 2);
+	float determinant = pow(dot(ray.dir, ray.pos - sphere.pos), 2) - 
+						pow(length(ray.pos - sphere.pos), 2) + 
+						pow(sphere.radius, 2);
 
 	if(determinant > 0.0f)
 	{
 		//calculate near/far distance from the origin of the ray to the points where it intersects the sphere
-		float d_far = -dot(ray.dir, ray.pos - (float3)sphere) + sqrt(determinant);
-		float d_near = -dot(ray.dir, ray.pos - (float3)sphere) - sqrt(determinant);
+		float d_far = -dot(ray.dir, ray.pos - sphere.pos) + sqrt(determinant);
+		float d_near = -dot(ray.dir, ray.pos - sphere.pos) - sqrt(determinant);
 		
+		//if sphere is intersected by line but not during this timestep
+		//return no intersection
 		if (d_near - ray.len > 0.0)
 			return col_info;
 		
 		col_info.collided = true;
 
 		//calculate whether the ray is actually currently intersecting the sphere
-		float3 normal = (ray.pos + ray.dir*d_near) - (float3)sphere;
+		float3 normal = (ray.pos + ray.dir*d_near) - sphere.pos;
 		normal = normalize(normal);
 		col_info.outgoing.pos = ray.pos + d_near;
 		col_info.outgoing.dir = reflect(ray.dir, normal);
@@ -131,7 +131,6 @@ CollisionInfo ray_sphere_collision(Ray ray)
 void ray_trace_main(uint2 tid : SV_DispatchThreadID)
 {
 	float step_dist = epsilon / ITERATIONS;
-	float4 color = bgr_color;
 	CollisionInfo ci;
 	Ray ray = (Ray)0;
 	ray.pos = float3(get_ndc_coords(tid.xy), -1.0f);
@@ -140,17 +139,19 @@ void ray_trace_main(uint2 tid : SV_DispatchThreadID)
 
 	[unroll]
 	for (int i = 0; i < ITERATIONS; i++)
-	{
-		//advance the ray forward 'step_dist'
-		ci = ray_sphere_collision(ray);
-		if (ci.collided)
+	{	
+		for (int j = 0; j < num_spheres; j++)
 		{
-			color = float4(abs(ci.outgoing.dir.x), 
-						   abs(ci.outgoing.dir.y), 
-						   abs(ci.outgoing.dir.z), 
-						   1.0f);//sphere_material;
-			color.w = 1.0f;
-			break;
+			Sphere s = spheres[j];
+
+			//advance the ray forward 'step_dist'
+			ci = ray_sphere_collision(ray, s);
+			if (ci.collided)
+			{
+				ray.pos = ci.outgoing;
+				//color calculation
+				break;
+			}
 		}
 
 		ray.pos += -step_dist;

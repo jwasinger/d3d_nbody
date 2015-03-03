@@ -15,6 +15,7 @@ namespace Core
 		desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
 		desc.ByteWidth = element_size * count;
 		desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+		desc.StructureByteStride = element_size;
 
 		if (initial_data)
 		{
@@ -28,9 +29,77 @@ namespace Core
 		}
 	}
 
+	HRESULT CreateStructuredBufferSRV(
+		ID3D11Device *device,
+		UINT element_size,
+		UINT element_count,
+		ID3D11Buffer *resource,
+		ID3D11ShaderResourceView **out_srv)
+	{
+		*out_srv = NULL;
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		ZeroMemory(&desc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+		desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+		desc.Buffer.ElementOffset = 0;
+		desc.Buffer.ElementWidth = element_size;
+		desc.Buffer.FirstElement = 0;
+		desc.Buffer.NumElements = element_count;
+		desc.Format = DXGI_FORMAT_UNKNOWN;
+		
+		return device->CreateShaderResourceView(resource, &desc, out_srv);
+	}
+
 	RayTracer::RayTracer(Renderer *renderer)
 	{
 		this->renderer = renderer;
+		ZeroMemory(spheres, sizeof(Sphere) * 16);
+		ZeroMemory(materials, sizeof(Material) * 16);
+		ZeroMemory(planes, sizeof(Plane) * 16);
+		ZeroMemory(vertices, sizeof(TexturedVertex) * 6);
+	}
+
+	void RayTracer::SetViewTransform(Matrix m)
+	{
+		this->view = m;
+		this->has_view = true;
+	}
+
+	void RayTracer::AddSphere(Sphere s)
+	{
+		if (num_spheres == 16)
+		{
+			log_str("trying to add too many spheres to the ray tracer (max is 16).\n");
+			return;
+		}
+		
+		this->spheres[num_spheres] = s;
+		num_spheres++;
+	}
+
+	int RayTracer::AddMaterial(Material m)
+	{
+		if (num_materials == 16)
+		{
+			log_str("trying to add too many materials (max is 16).\n");
+			return -1;
+		}
+
+		this->materials[num_materials] = m;
+		num_materials++;
+		return num_materials-1;
+	}
+
+	void RayTracer::AddPlane(Plane p)
+	{
+		if (num_planes == 16)
+		{
+			log_str("trying to add too many planes (max is 16).\n");
+			return;
+		}
+
+		this->planes[num_planes] = p;
+		num_planes++;
 	}
 
 	bool RayTracer::Init(void)
@@ -141,9 +210,6 @@ namespace Core
 
 		this->params.bgr_color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		this->params.epsilon = 200.0;
-		this->params.sphere = Vector4(0.0f, 0.0f, -10.0f, 1.0f);
-		this->params.sphere_material = Vector4(1.0f, 0.0f, 0.0f, 0.5f);
-		this->params.view_transform = Matrix::Identity();
 
 		if (FAILED(res = this->renderer->GetDevice()->CreateBuffer(
 			&c_buf_desc,
@@ -152,6 +218,76 @@ namespace Core
 			)))
 		{
 			log_str("CreateBuffer Failed: %s\n", get_err_str(res));
+			return false;
+		}
+
+		//create structured buffers --------------------------------------------------
+
+		if (FAILED(res = CreateStructuredBuffer(
+			this->renderer->GetDevice(),
+			sizeof(Plane),
+			16,
+			NULL,
+			&this->plane_buffer)))
+		{
+			log_str("Failed to create plane buffer: %s", get_err_str(res));
+			return false;
+		}
+
+		if (FAILED(res = CreateStructuredBuffer(
+			this->renderer->GetDevice(),
+			sizeof(Sphere),
+			16,
+			NULL,
+			&this->sphere_buffer)))
+		{
+			log_str("Failed to create sphere buffer: %s", get_err_str(res));
+			return false;
+		}
+
+		if (FAILED(res = CreateStructuredBuffer(
+			this->renderer->GetDevice(),
+			sizeof(Material),
+			16,
+			NULL,
+			&this->material_buffer)))
+		{
+			log_str("Failed to create material buffer: %s", get_err_str(res));
+			return false;
+		}
+
+		//create structured buffer SRVs -----------------------------------------------
+
+		if (FAILED(res = CreateStructuredBufferSRV(
+			this->renderer->GetDevice(),
+			sizeof(Plane),
+			16,
+			this->plane_buffer,
+			&this->plane_buf_srv)))
+		{
+			log_str("failed to create plane buffer SRV: %s", get_err_str(res));
+			return false;
+		}
+
+		if (FAILED(res = CreateStructuredBufferSRV(
+			this->renderer->GetDevice(),
+			sizeof(Sphere),
+			16,
+			this->sphere_buffer,
+			&this->sphere_buf_srv)))
+		{
+			log_str("failed to create sphere buffer SRV: %s", get_err_str(res));
+			return false;
+		}
+
+		if (FAILED(res = CreateStructuredBufferSRV(
+			this->renderer->GetDevice(),
+			sizeof(Material),
+			16,
+			this->material_buffer,
+			&this->material_buf_srv)))
+		{
+			log_str("failed to create material buffer SRV: %s", get_err_str(res));
 			return false;
 		}
 
@@ -205,13 +341,38 @@ namespace Core
 		return true;
 	}
 
+	void RayTracer::updateBuffers(void)
+	{
+		D3D11_MAPPED_SUBRESOURCE subresource;
+
+		this->renderer->GetDeviceContext()->Map(this->sphere_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &subresource);
+		memcpy(subresource.pData, this->spheres, sizeof(Sphere) * 16);
+		this->renderer->GetDeviceContext()->Unmap(this->sphere_buffer, 0);
+
+		this->renderer->GetDeviceContext()->Map(this->material_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &subresource);
+		memcpy(subresource.pData, this->materials, sizeof(Material) * 16);
+		this->renderer->GetDeviceContext()->Unmap(this->material_buffer, 0);
+
+		this->renderer->GetDeviceContext()->Map(this->plane_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &subresource);
+		memcpy(subresource.pData, this->planes, sizeof(Plane) * 16);
+		this->renderer->GetDeviceContext()->Unmap(this->plane_buffer, 0);
+	}
+
 	void RayTracer::Run()
 	{
+		//TODO: transform all objects in the buffers from world space to camera space
+		this->updateBuffers();
+		
 		UINT counts[1] = { 1 };
 		
 		ID3D11UnorderedAccessView *uavNull[1] = {nullptr};
-		
+		ID3D11ShaderResourceView *srvNull[1] = {nullptr};
+
 		this->renderer->GetDeviceContext()->CSSetShader(this->ray_tracer_shader, nullptr, 0);
+		this->renderer->GetDeviceContext()->CSSetShaderResources(0, 1, &this->material_buf_srv);
+		this->renderer->GetDeviceContext()->CSSetShaderResources(1, 1, &this->sphere_buf_srv);
+		this->renderer->GetDeviceContext()->CSSetShaderResources(2, 1, &this->plane_buf_srv);
+
 		this->renderer->GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, &this->output_uav, nullptr);
 		this->renderer->GetDeviceContext()->CSSetConstantBuffers(0, 1, &this->params_c_buffer);
 		

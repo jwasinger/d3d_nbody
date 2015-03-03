@@ -29,6 +29,7 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 void createSimulationResources(void);
 void Update(double elapsed);
 void Render(void);
+void init_ray_tracer_scene(void);
 
 bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
@@ -104,9 +105,27 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return false;
 	}
 
+	init_ray_tracer_scene();
 	init = true;
-	//ShellExecute(hWnd, "open", "DebugConsole.exe", NULL, NULL, 0);
+
 	return true;
+}
+
+void init_ray_tracer_scene(void)
+{
+	Material material;
+	material.ambient_color = Vector3(1.0f, 0.0f, 0.0f);
+	material.ambient_intensity = 0.7f;
+	material.reflectivity = 0.7f;
+
+	int index = ray_tracer->AddMaterial(material);
+
+	Sphere s;
+	s.material_index = index;
+	s.pos = Vector3(0.0f, 0.0f, -10.0f);
+	s.radius = 1.0f;
+
+	ray_tracer->AddSphere(s);
 }
 
 void Update(double elapsed)
