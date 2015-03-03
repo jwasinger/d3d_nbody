@@ -10,6 +10,30 @@
 
 namespace Core
 {
+	struct Material
+	{
+		Vector3 ambient_color;
+		float ambient_intensity;
+		float reflectivity;
+		Vector3 padding;
+	};
+
+	struct Sphere
+	{
+		Vector3 pos;
+		float radius;
+		int material_index;
+	};
+
+	struct Plane
+	{
+		Vector3 v1;
+		float padding;
+		Vector3 v2;
+		float padding1;
+		int material_index;
+	};
+
 	struct RayTracerParams
 	{
 		Matrix view_transform;
@@ -20,6 +44,13 @@ namespace Core
 		Vector4 sphere_material; //x,y,z color and w reflectivity
 	};
 
+	HRESULT CreateStructuredBuffer(
+		ID3D11Device *device,
+		UINT element_size,
+		UINT count,
+		void *initial_data,
+		ID3D11Buffer **out);
+	
 	class RayTracer
 	{
 	private:
@@ -34,6 +65,10 @@ namespace Core
 		RayTracerParams params;
 		ID3D11Buffer *params_c_buffer;
 		TexturedVertex vertices[6];
+
+		ID3D11Buffer *plane_buffer;
+		ID3D11Buffer *material_buffer;
+		ID3D11Buffer *sphere_buffer;
 
 	public:
 		RayTracer(Renderer *renderer);

@@ -2,6 +2,32 @@
 
 namespace Core
 {
+	HRESULT CreateStructuredBuffer(
+		ID3D11Device *device,
+		UINT element_size,
+		UINT count,
+		void *initial_data,
+		ID3D11Buffer **out)
+	{
+		*out = NULL;
+		D3D11_BUFFER_DESC desc;
+		ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
+		desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+		desc.ByteWidth = element_size * count;
+		desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+
+		if (initial_data)
+		{
+			D3D11_SUBRESOURCE_DATA subresource_data;
+			subresource_data.pSysMem = &initial_data;
+			return device->CreateBuffer(&desc, &subresource_data, out);
+		}
+		else
+		{
+			return device->CreateBuffer(&desc, NULL, out);
+		}
+	}
+
 	RayTracer::RayTracer(Renderer *renderer)
 	{
 		this->renderer = renderer;
@@ -115,7 +141,7 @@ namespace Core
 
 		this->params.bgr_color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		this->params.epsilon = 200.0;
-		this->params.sphere = Vector4(0.0f, 0.0f, -10.0f, 0.5f);
+		this->params.sphere = Vector4(0.0f, 0.0f, -10.0f, 1.0f);
 		this->params.sphere_material = Vector4(1.0f, 0.0f, 0.0f, 0.5f);
 		this->params.view_transform = Matrix::Identity();
 
