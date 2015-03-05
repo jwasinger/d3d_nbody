@@ -86,10 +86,9 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if(!renderer->Init(windowRect, hWnd))
 		return false;
 	
-	ray_tracer = new RayTracer(renderer);
+	ray_tracer = new RayTracer(256, 256, renderer);
 	if (!ray_tracer->Init())
 		return false;
-
 
 	init_ray_tracer_scene();
 	ray_tracer->Run();
@@ -116,13 +115,13 @@ void init_ray_tracer_scene(void)
 {
 	Material m1;
 	m1.ambient_color = Vector3(1.0f, 0.0f, 0.0f);
-	m1.ambient_intensity = 0.7f;
-	m1.reflectivity = 0.7f;
+	m1.ambient_intensity = 0.6f;
+	m1.reflectivity = 0.9f;
 
 	Material m2;
 	m2.ambient_color = Vector3(0.0f, 1.0f, 0.0f);
-	m2.ambient_intensity = 1.0f;
-	m2.reflectivity = 1.0f;
+	m2.ambient_intensity = 0.7f;
+	m2.reflectivity = 0.9f;
 
 	int index1 = ray_tracer->AddMaterial(m1);
 	int index2 = ray_tracer->AddMaterial(m2);
@@ -134,7 +133,7 @@ void init_ray_tracer_scene(void)
 
 	Sphere s2;
 	s2.material_index = index2;
-	s2.pos = Vector3(-1.5f, 0.0f, -5.0f);
+	s2.pos = Vector3(-3.0f, 0.0f, -15.0f);
 	s2.radius = 1.0f;
 
 	ray_tracer->AddSphere(s1);
@@ -149,8 +148,6 @@ void Update(double elapsed)
 void Render(void)
 {
 	renderer->BeginRender();
-
-	ray_tracer->Run();
 
 	ray_tracer->Render();
 
