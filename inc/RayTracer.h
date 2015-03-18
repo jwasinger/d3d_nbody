@@ -5,17 +5,24 @@
 #include "Vertex.h"
 #include "log.h"
 
+#define DIRECTIONAL_LIGHT 0 
+#define POINT_LIGHT		  1
+
 namespace Core
 {
 	struct Light
 	{
 		int type;
 		Vector3 pos_direction;
+		float diffuse_intensity;
+		float spec_coefficient;
+	  //float spec_intensity;
 	};
 
 	struct Triangle
 	{
-		Vector3 v0, v1, v2;
+		Vector3 a, b, c;
+		UINT material_index;
 	};
 
 	struct Material
@@ -39,18 +46,22 @@ namespace Core
 		int material_index;
 	};
 
+	struct CollisionInfo
+	{
+		Vector3 position;
+		Vector3 surface_normal;
+		Vector3 outgoing_dir;
+		Material obj_material;
+	};
+
 	struct Ray
 	{
 		Vector3 pos;
 		Vector3 dir;
 		float len;
-	};
-
-	struct CollisionInfo
-	{
-		Ray outgoing;
-		bool collided;
-		bool error;
+		std::vector<CollisionInfo> collisions;
+		bool error = false;
+		bool absorbed = false;
 	};
 
 	class RayTracer
@@ -63,6 +74,7 @@ namespace Core
 
 		Matrix view;
 		bool has_view = false;
+		Vector3 view_pos = Vector3(0.0f, 0.0f, 0.0f);
 
 		TexturedVertex vertices[6];
 		ID3D11Texture2D *ray_tracer_output;
@@ -79,21 +91,39 @@ namespace Core
 		int num_materials;
 		int num_planes;
 		int num_lights;
+		int num_tris;
 
 		UINT width, height;
 		UINT iterations;
 		float epsilon;
 
+		Vector3 black_hole_pos;
+		float black_hole_sr;
+
+		void init_black_hole(void);
+		void black_hole_bend_ray(Ray &ray);
+		bool ray_bh_collision(const Ray &ray);
+		void ray_bh_interaction(Ray &ray);
+		
 		Vector4 *raw_data;
 		void write_pix(UINT x, UINT y, Vector4 val);
 		void update_pix_buffer(void);
 		Vector4 ray_trace(UINT x, UINT y);
 		Vector2 get_ndc_coords(UINT x, UINT y);
-		CollisionInfo ray_sphere_collision(Ray ray, Sphere sphere);
-		bool compute_shadows(Vector3 position)
-		{
-			
-		}
+		
+		bool ray_sphere_collision(Ray &ray, Sphere sphere);
+		bool vec_sphere_intersection(Vector3 dir, Vector3 pos, Sphere sphere);
+
+		bool ray_triangle_collision(Ray &ray, Triangle tri);
+		bool vec_triangle_intersection(Vector3 pos, Vector3 dir, Triangle tri);
+
+
+		std::vector<Light> compute_lighting(Vector3 position);
+		Vector4 compute_total_color(std::vector<CollisionInfo> collisions);
+		Vector4 compute_collision_color(const CollisionInfo &info);
+		
+		void enable_view(bool enable);
+		void set_view(Matrix m);
 
 	public:
 		RayTracer(UINT width, UINT height, Renderer *renderer);
@@ -106,6 +136,7 @@ namespace Core
 		int AddMaterial(Material m);
 		void AddPlane(Plane p);
 		void AddLight(Light l);
+		void AddTriangleCC(Triangle t);
 
 		void SetViewTransform(Matrix m);
 	};
