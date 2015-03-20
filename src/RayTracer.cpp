@@ -14,7 +14,7 @@ namespace Core
 		this->iterations = 100;
 		this->epsilon = 10.0f;
 
-		this->bgr_color = Vector4(0.3f, 0.0f, 0.0f, 1.0f);
+		this->bgr_color = Vector4(0.0f, 0.0f, 0.0f, 1.0f);
 		ZeroMemory(spheres, sizeof(Sphere) * 16);
 		ZeroMemory(materials, sizeof(Material) * 16);
 		ZeroMemory(planes, sizeof(Plane) * 16);
@@ -22,6 +22,18 @@ namespace Core
 		ZeroMemory(vertices, sizeof(TexturedVertex) * 6);
 
 		this->raw_data = new Vector4[width*height];
+		
+		/*
+		square jitters:
+		
+		this->jitters[0] = Vector2(0.25f, 0.5f);
+		this->jitters[1] = Vector2(0.5f, 0.75f);
+		this->jitters[2] = Vector2(0.75f, 0.5f);
+		this->jitters[3] = Vector2(0.5f, 0.25f);
+		*/
+		this->generate_circle_jitters(3, 0.5f);
+
+		this->focal_len = 3.0f;
 	}
 
 	void RayTracer::SetViewTransform(Matrix m)
@@ -179,8 +191,6 @@ namespace Core
 			return false;
 		}
 
-		this->init_black_hole();
-
 		//initialize all pixels to red
 		for (int i = 0; i < height; i++)
 		{
@@ -194,7 +204,62 @@ namespace Core
 		return true;
 	}
 
-	Vector2 RayTracer::get_ndc_coords(UINT x, UINT y)
+	void RayTracer::generate_circle_jitters(int num, float r)
+	{
+		//start at 0 and go to 2pi
+		float theta = 0.0f;
+		float step = (2 * 3.14159f) / num;
+		float pix_width, pix_height;
+		pix_width = 1.0f / (float)this->width;
+		pix_height = 1.0f / (float)this->height;
+
+		for (int i = 0; i < num; i++, theta += step)
+		{
+			Vector2 jitter = Vector2(cos(theta) * r, sin(theta) * r);
+			jitter.y *= pix_height;
+			jitter.x *= pix_width;
+
+			jitter += Vector2(pix_width*0.5f, pix_height*0.5f);
+			this->jitters.push_back(jitter);
+		}
+	}
+
+	Vector4 RayTracer::trace_pixel(UINT x, UINT y)
+	{
+		float pix_width, pix_height;
+		pix_width = 2.0f / (float)this->width;
+		pix_height = 2.0f / (float)this->height;
+		Vector3 ray_vec;
+		Vector3 ray_pos;
+		Vector2 coords = get_ndc_coords(x, y);
+		Vector3 focal_pos = Vector3(coords.x + pix_width*0.5f, coords.y + pix_height*0.5f, -this->focal_len);
+		std::vector<Vector4> out_colors;
+
+		for (int i = 0; i < this->jitters.size(); i++)
+		{
+			ray_pos = Vector3(coords.x, coords.y, -1.0f);
+			ray_pos += Vector3(this->jitters[i].x, this->jitters[i].y, 0.0f);
+
+		    ray_vec = focal_pos - ray_pos;
+			ray_vec.Normalize();
+			//ray_vec = Vector3(0.0f, 0.0f, -1.0f);
+
+			//create vector from (x,y) + jitter[i] to middle(x,y) + focal_len
+			out_colors.push_back(this->ray_trace(ray_pos, ray_vec));
+		}
+
+		Vector4 combined = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+		for (int i = 0; i < out_colors.size(); i++)
+		{
+			combined += out_colors[i];
+		}
+
+		combined /= (float)out_colors.size();
+		combined.w = 1.0f;
+		return combined;
+	}
+
+	Vector2 RayTracer::get_ndc_coords(float x, float y)
 	{
 		Vector2 output = Vector2(x, y);
 
@@ -380,59 +445,25 @@ namespace Core
 		return collided;
 	}
 
-	bool RayTracer::ray_bh_collision(const Ray &ray)
-	{
-		Vector3 ray_bh_vec = ray.pos - this->black_hole_pos;
-		if (ray_bh_vec.Length() <= this->black_hole_sr)
-			return true;
-		
-		ray_bh_vec = ray.pos + ray.dir*ray.len;
-		ray_bh_vec = ray_bh_vec - this->black_hole_pos;
-		if (ray_bh_vec.Length() <= this->black_hole_sr)
-			return true;
-
-		return false;
-	}
-
-	void RayTracer::ray_bh_interaction(Ray &ray)
-	{
-		//if the ray is intersecting the the plane of interaction:
-		//	alter its course
-
-		Vector3 ray_plane_vec = this->black_hole_pos - ray.pos;
-		ray_plane_vec.z = abs(ray_plane_vec.z);
-
-		if (ray_plane_vec.z < 0.0f)
-			return;
-		if (ray_plane_vec.z > ray.len)
-			return;
-
-		black_hole_bend_ray(ray);
-	}
-
-	Vector4 RayTracer::ray_trace(UINT x, UINT y)
+	Vector4 RayTracer::ray_trace(const Vector3 &ray_pos, const Vector3 &ray_dir)
 	{
 		Ray ray;
-		Vector2 pos2D = this->get_ndc_coords(x, y);
-		ray.pos = Vector3(pos2D.x, pos2D.y, 0.0f);
-		ray.dir = Vector3(0.0f, 0.0f, -1.0f);
+		ray.pos = ray_pos;
+		ray.dir = ray_dir;
 		ray.len = this->epsilon / this->iterations;
 		ray.collisions = std::vector<CollisionInfo>(0);
 		Vector4 out_color = this->bgr_color;
 		Vector3 out_color3;
-
+		
+		/*
 		if (x == 10 && y == 10)
 		{
 			int test = 5;
 		}
-
+		*/
 		for (int i = 0; i < this->iterations; i++)
 		{
 			//run a timestep
-			//calculate the deflection of the ray by the black hole
-			if (ray_bh_collision(ray))
-				return Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-			ray_bh_interaction(ray);
 
 			bool collided = false;
 
@@ -479,65 +510,6 @@ namespace Core
 			out_color = this->compute_total_color(ray.collisions);
 
 		return out_color;
-	}
-	
-	void RayTracer::init_black_hole(void)
-	{
-		this->black_hole_pos = Vector3(-0.015f, -0.015f, -3.0f);
-		this->black_hole_sr = 0.1f;
-	}
-
-	//Vector3 RayTracer::calc_near_point(const Ray &ray)
-	//{	
-		//in the simple case as is here, the ray will be closest to the black hole 
-	//	Vector3 np;
-	//}
-
-
-	/*
-	void RayTracer::black_hole_bend_ray(Ray &ray)
-	{
-		//find the closest point (point of action) between ray and black hole
-
-		Vector3 bh_ray = this->black_hole_pos - ray.pos;
-		// TODO position-based optimization here
-		//if (bh_ray.Length() )
-		//
-		float theta = 2.0 * (this->black_hole_sr / bh_ray.Length());
-		bh_ray.Normalize();
-		Vector3 tangent = bh_ray.Cross(ray.dir);
-		tangent.Normalize();
-		if (tangent == Vector3(0.0f, 0.0f, 0.0f))
-		{
-			return; //ray direction is directly in the direction of black hole.
-		}
-
-		Matrix rotation = Matrix::CreateFromAxisAngle(-tangent, theta);
-		ray.dir = Vector3::TransformNormal(ray.dir, rotation);
-		ray.dir.Normalize();
-	}
-	*/
-
-	void RayTracer::black_hole_bend_ray(Ray &ray)
-	{
-		//find the closest point (point of action) between ray and black hole
-		Vector3 closest_pt = Vector3(ray.pos.x, ray.pos.y, this->black_hole_pos.z);
-		float r = (closest_pt - this->black_hole_pos).Length();
-		float theta = 2.0 * (this->black_hole_sr / r);
-		theta *= 0.07f;
-
-		Vector3 bh_ray = this->black_hole_pos - ray.pos;
-		bh_ray.Normalize();
-		Vector3 tangent = bh_ray.Cross(ray.dir);
-		tangent.Normalize();
-		if (tangent == Vector3(0.0f, 0.0f, 0.0f))
-		{
-			return; //ray direction is directly in the direction of black hole.
-		}
-
-		Matrix rotation = Matrix::CreateFromAxisAngle(-tangent, theta);
-		ray.dir = Vector3::TransformNormal(ray.dir, rotation);
-		ray.dir.Normalize();
 	}
 
 	std::vector<Light> RayTracer::compute_lighting(Vector3 position)
@@ -667,7 +639,7 @@ namespace Core
 		{
 			for (UINT j = 0; j < this->width; j++)
 			{
-				Vector4 color = this->ray_trace(j, i);
+				Vector4 color = this->trace_pixel(j, i);
 				this->write_pix(j, i, color);
 			}
 		}

@@ -70,8 +70,6 @@ namespace Core
 		Renderer *renderer = NULL;
 		ID3D11Buffer *quadVBuffer = NULL;
 
-		ID3D11ComputeShader *ray_tracer_shader = NULL;
-
 		Matrix view;
 		bool has_view = false;
 		Vector3 view_pos = Vector3(0.0f, 0.0f, 0.0f);
@@ -97,20 +95,23 @@ namespace Core
 		UINT iterations;
 		float epsilon;
 
-		Vector3 black_hole_pos;
-		float black_hole_sr;
+		//define positions of four 'jittered' rays.  These values are defined with respect
+		//to the boundary of a pixel (origin lower lefthand corner) with range [0,0] -> [1,1]
+		//Vector2 jitters[4]; 
+		std::vector<Vector2> jitters;
 
-		void init_black_hole(void);
-		void black_hole_bend_ray(Ray &ray);
-		bool ray_bh_collision(const Ray &ray);
-		void ray_bh_interaction(Ray &ray);
-		
+		float focal_len;
+
 		Vector4 *raw_data;
 		void write_pix(UINT x, UINT y, Vector4 val);
 		void update_pix_buffer(void);
-		Vector4 ray_trace(UINT x, UINT y);
-		Vector2 get_ndc_coords(UINT x, UINT y);
+
+		Vector4 trace_pixel(UINT x, UINT y);
+		Vector4 ray_trace(const Vector3 &ray_pos, const Vector3 &ray_dir);
+		Vector2 get_ndc_coords(float x, float y);
 		
+		void generate_circle_jitters(int num, float r);
+
 		bool ray_sphere_collision(Ray &ray, Sphere sphere);
 		bool vec_sphere_intersection(Vector3 dir, Vector3 pos, Sphere sphere);
 

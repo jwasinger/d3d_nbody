@@ -114,17 +114,38 @@ bool Init(WNDPROC wndProcFunction, HINSTANCE hInstance, HINSTANCE hPrevInstance,
 void black_hole_scene(void)
 {
 	Sphere s1;
+	Sphere s2;
+	Sphere s3;
+
 	Material m1;
 	m1.ambient_color = Vector3(1.0f, 0.0f, 0.0f);
-	m1.ambient_intensity = 0.2f;
+	m1.ambient_intensity = 0.3f;
 	m1.reflectivity = 0.5f;
 	int i1 = ray_tracer->AddMaterial(m1);
 
+	Material m2;
+	m2.ambient_color = Vector3(0.5f, 0.5f, 0.0f);
+	m2.ambient_intensity = 0.7f;
+	m2.reflectivity = 0.5f;
+	int i2 = ray_tracer->AddMaterial(m2);
+
 	s1.material_index = i1;
-	s1.pos = Vector3(0.0f, 0.0f, -5.0f);
-	s1.radius = 0.5f;
+	s1.pos = Vector3(0.0f, 0.0f, -6.0f);
+	s1.radius = 1.0f;
+
+	/*
+	s2.material_index = i1;
+	s2.pos = Vector3(-0.5f, -0.5f, -5.0f);
+	s2.radius = 0.5f;
+	*/
+
+	s3.material_index = i2;
+	s3.pos = Vector3(-1.0f, -1.0f, -4.3f);
+	s3.radius = 0.5f;
 
 	ray_tracer->AddSphere(s1);
+	//ray_tracer->AddSphere(s2);
+	ray_tracer->AddSphere(s3);
 
 	Light l;
 	l.type = DIRECTIONAL_LIGHT;
